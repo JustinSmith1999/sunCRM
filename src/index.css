@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* sunCRM type system: Inter for body, Fraunces for display headlines. */
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #0B0F14;            /* ink */
+    background: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-feature-settings: 'cv11', 'ss01', 'ss03';  /* Inter alt forms — slightly more elegant */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Display headlines opt into the serif via .font-display or a typography component. */
+  .font-display {
+    font-family: 'Fraunces', 'Iowan Old Style', 'Apple Garamond', Georgia, serif;
+    font-feature-settings: 'ss01';
+    letter-spacing: -0.01em;
+  }
+
+  /* Tabular numerics on prices, durations, counts. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tap highlight uses the sky brand color, lightly tinted. */
+  * {
+    -webkit-tap-highlight-color: rgba(0, 174, 239, 0.18);
+  }
+
+  /* Prevent iOS auto-zoom when an input is focused. */
+  input, select, textarea {
+    font-size: 16px;
+  }
+
+  /* Hairlines look like real hairlines on retina. */
+  hr, .hairline {
+    border-color: #E5E7EB;
+    border-width: 0.5px;
+  }
+}
+
+@layer utilities {
+  .touch-manipulation { touch-action: manipulation; }
+  .safe-top    { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* Press scale — pair with `transition-transform duration-fast ease-smooth`
+     to get the slight squish PB Heaven uses on every tactile control. */
+  .press-scale:active { transform: scale(0.97); }
+
+  /* Subtle entrance for content. */
+  @keyframes sun-fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .animate-fade-up { animation: sun-fade-up 240ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+}

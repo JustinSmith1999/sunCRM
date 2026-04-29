@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script>
+        function timestamp() {
+            var response = document.getElementById("g-recaptcha-response");
+            if (response == null || response.value.trim() == "") {
+                var elems = JSON.parse(document.getElementsByName("captcha_settings")[0].value);
+                elems["ts"] = JSON.stringify(new Date().getTime());
+                document.getElementsByName("captcha_settings")[0].value = JSON.stringify(elems);
+            }
+        }
+        setInterval(timestamp, 500);
+    </script>
+
+    <style>
+        form {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        form label {
+            display: inline-block;
+            width: 180px;
+            margin-bottom: 5px;
+            vertical-align: top;
+        }
+
+        form label.required::after {
+            content: " *";
+            color: red;
+        }
+
+        form input[type="text"],
+        form select,
+        form textarea {
+            width: 100%;
+            height: 40px;
+            margin-bottom: 10px;
+            padding: 5px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        form textarea {
+            resize: vertical;
+            height: auto;
+        }
+
+        form input[type="checkbox"] {
+            width: auto;
+            height: auto;
+            margin-top: 8px;
+            margin-bottom: 10px;
+        }
+
+        form input[type="submit"] {
+            width: auto;
+            height: 40px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        br {
+            line-height: 20px;
+        }
+
+        .g-recaptcha {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<form action="https://husbupeealwuxyopfwwb.supabase.co/functions/v1/web-to-lead" method="POST">
+
+    <!-- Form key for CRM - IMPORTANT: Create this in your CRM's Web Forms Console -->
+    <input type="hidden" name="form_key" value="sunation-contact-form">
+
+    <!-- Redirect URL after submission -->
+    <input type="hidden" name="retURL" value="https://www.sunation.com/cp-thankyou/">
+
+    <!-- Keep Salesforce fields for backward compatibility if needed -->
+    <input type="hidden" name='captcha_settings' value='{"keyname":"sunation_recaptcha","fallback":"true","orgId":"00D80000000dmAG","ts":""}'>
+
+    <label class="required" for="first_name">First Name</label>
+    <input id="first_name" maxlength="40" name="first_name" type="text" required><br>
+
+    <label class="required" for="last_name">Last Name</label>
+    <input id="last_name" maxlength="80" name="last_name" type="text" required><br>
+
+    <label class="required" for="street">Street Address</label>
+    <textarea id="street" name="street" rows="2" required></textarea><br>
+
+    <label class="required" for="city">City</label>
+    <input id="city" maxlength="40" name="city" type="text" required><br>
+
+    <label class="required" for="state">State/Province</label>
+    <input id="state" maxlength="20" name="state" type="text" required><br>
+
+    <label class="required" for="zip">Zip</label>
+    <input id="zip" maxlength="20" name="zip" type="text" required><br>
+
+    <label class="required" for="county">County</label>
+    <select id="county" name="county" title="County" required>
+        <option value="">Select One</option>
+        <option value="Bronx">Bronx</option>
+        <option value="Kings">Kings</option>
+        <option value="Nassau">Nassau</option>
+        <option value="New York">New York</option>
+        <option value="Queens">Queens</option>
+        <option value="Richmond">Richmond</option>
+        <option value="Suffolk">Suffolk</option>
+    </select><br>
+
+    <label class="required" for="email">Email</label>
+    <input id="email" maxlength="80" name="email" type="text" required><br>
+
+    <label class="required" for="phone">Phone</label>
+    <input id="phone" maxlength="40" name="phone" type="text" required><br>
+
+    <label for="utility">Utility</label>
+    <select id="utility" name="utility" title="Utility">
+        <option value="">Select One</option>
+        <option value="Con-Ed">Con-Ed</option>
+        <option value="National Grid">National Grid</option>
+        <option value="PSEG">PSEG</option>
+    </select><br>
+
+    <label for="utility_account_1">Utility Account Number</label>
+    <input id="utility_account_1" maxlength="18" name="utility_account_1" type="text"><br>
+
+    <label class="required" for="own_residence">Own Residence?</label>
+    <select id="own_residence" name="own_residence" title="Own Residence?" required>
+        <option value="">Select One</option>
+        <option value="YES">YES</option>
+        <option value="NO">NO</option>
+    </select><br>
+
+    <label class="required" for="type_of_installation">Type of Installation</label>
+    <select id="type_of_installation" name="type_of_installation" title="Type of Installation" required>
+        <option value="">Select One</option>
+        <option value="Residential">Residential</option>
+        <option value="Add On">Add On</option>
+        <option value="Residential - Fire Island">Residential - Fire Island</option>
+        <option value="SUNation Roofing">SUNation Roofing</option>
+    </select><br>
+
+    <label for="new_construction">New Construction</label>
+    <input id="new_construction" name="new_construction" type="checkbox" value="1"><br>
+
+    <label for="sales_notes">Sales Notes</label>
+    <textarea id="sales_notes" name="sales_notes" rows="3" wrap="soft"></textarea><br>
+
+    <div class="g-recaptcha" data-sitekey="6LfdMhwrAAAAAICMLj_opRH6vdGdVfGnfOzUZ66a"></div>
+
+    <div class="hidden">
+        <label for="partner">Partner</label>
+        <input type="text" id="partner" name="partner" value="3 Sons Energy">
+
+        <label for="lead_source">Lead Source</label>
+        <input type="text" id="lead_source" name="lead_source" value="3 Sons Energy">
+    </div>
+
+    <input type="submit" name="submit" value="Submit">
+
+</form>
+
+</body>
+</html>

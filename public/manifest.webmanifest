@@ -1,0 +1,22 @@
+{
+  "name": "sunCRM — SUNation Energy",
+  "short_name": "sunCRM",
+  "description": "SUNation Energy ERP — sales, service, operations, HR, and finance.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#005088",
+  "theme_color": "#00AEEF",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Leads",  "url": "/?view=leads",  "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Deals",  "url": "/?view=deals",  "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "My Day", "url": "/?view=myday",  "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

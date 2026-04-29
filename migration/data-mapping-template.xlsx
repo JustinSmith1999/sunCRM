@@ -1,0 +1,49 @@
+# Data Mapping Template
+
+## Salesforce to SUNation CRM Field Mapping
+
+### Account Object Mapping
+| Salesforce Field | SF API Name | SF Type | SUNation Field | SN API Name | SN Type | Notes |
+|------------------|-------------|---------|----------------|-------------|---------|-------|
+| Account Name | Name | Text(255) | Account Name | name | text | Required |
+| Account Number | AccountNumber | Text(40) | Account Number | account_number | text | |
+| Type | Type | Picklist | Type | type | text | Map picklist values |
+| Industry | Industry | Picklist | Industry | industry | text | Map picklist values |
+| Annual Revenue | AnnualRevenue | Currency | Annual Revenue | annual_revenue | numeric | |
+| Number of Employees | NumberOfEmployees | Number | Employee Count | employee_count | integer | |
+| Phone | Phone | Phone | Phone | phone | text | |
+| Website | Website | URL | Website | website | text | |
+| Billing Address | BillingAddress | Address | Billing Address | billing_address | jsonb | Convert to JSON |
+| Shipping Address | ShippingAddress | Address | Shipping Address | shipping_address | jsonb | Convert to JSON |
+
+### Contact Object Mapping
+| Salesforce Field | SF API Name | SF Type | SUNation Field | SN API Name | SN Type | Notes |
+|------------------|-------------|---------|----------------|-------------|---------|-------|
+| First Name | FirstName | Text(40) | First Name | first_name | text | Required |
+| Last Name | LastName | Text(80) | Last Name | last_name | text | Required |
+| Email | Email | Email | Email | email | text | |
+| Phone | Phone | Phone | Phone | phone | text | |
+| Mobile Phone | MobilePhone | Phone | Mobile | mobile | text | |
+| Title | Title | Text(128) | Title | title | text | |
+| Department | Department | Text(80) | Department | department | text | |
+| Mailing Address | MailingAddress | Address | Mailing Address | mailing_address | jsonb | Convert to JSON |
+
+### Opportunity Object Mapping
+| Salesforce Field | SF API Name | SF Type | SUNation Field | SN API Name | SN Type | Notes |
+|------------------|-------------|---------|----------------|-------------|---------|-------|
+| Opportunity Name | Name | Text(120) | Name | name | text | Required |
+| Amount | Amount | Currency | Amount | amount | numeric | |
+| Stage | StageName | Picklist | Stage | stage | enum | Map to enum values |
+| Probability | Probability | Percent | Probability | probability | integer | |
+| Close Date | CloseDate | Date | Close Date | close_date | date | |
+| Next Step | NextStep | Text(255) | Next Step | next_step | text | |
+| Description | Description | Long Text | Description | description | text | |
+| Lead Source | LeadSource | Picklist | Lead Source | lead_source | text | |
+
+### Custom Fields Template
+| Object | SF Field Label | SF API Name | SF Type | Business Purpose | SUNation Mapping | Migration Notes |
+|--------|----------------|-------------|---------|------------------|------------------|-----------------|
+| Account | Solar Capacity | Solar_Capacity__c | Number | Track installation size | custom_fields | Create custom field |
+| Account | Installation Date | Install_Date__c | Date | Track go-live date | custom_fields | Create custom field |
+| Opportunity | System Size | System_Size__c | Number | Solar system size | custom_fields | Create custom field |
+| Contact | Decision Maker | Decision_Maker__c | Checkbox | Identify key contacts | custom_fields | Create custom field |

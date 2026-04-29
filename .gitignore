@@ -1,0 +1,44 @@
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Secrets — never commit. Set them in Netlify dashboard instead.
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Employee PII — names, departments, payroll exports. Don't commit publicly.
+employees-to-import.json
+employees-import-result.json
+employees-array.txt
+parsed-employees-output.txt
+real-sunation-employees.csv
+hr-records-import.csv
+leads-import.csv
+
+# Throwaway DB probes
+sb-probe.mjs
+sb-test.mjs
+
+# Netlify CLI scratch
+.netlify/

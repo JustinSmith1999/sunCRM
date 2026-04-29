@@ -1,0 +1,25 @@
+name,api_name,description,flow_type,triggered_object,status,updated_at
+Account - Created for Channel Partner - Need Community User,account_created_channel_partner,,record_triggered_after_save,Account,activated,2024-10-12T04:54:00Z
+Account - If Acct Owner Chg - Chk Opp Owner for Aurora Trigger,account_owner_change_aurora,Flow was created to ensure Aurora Trigger is checked,record_triggered_after_save,Account,activated,2024-10-12T04:53:00Z
+Account - New Account Update Related Contact,account_new_update_contact,If an account was created manually not from converting update Related Contact with Primary Contact,record_triggered_after_save,Account,activated,2025-07-16T16:42:00Z
+Account - Update Account Name with Mailing Address on create,account_update_name_address,Commerical Record Type excluded,record_triggered_after_save,Account,activated,2025-10-03T13:10:00Z
+Account - Update Owner from List View,account_update_owner_listview,Account Object currently does not have the Change owner option from listview thus created this flow,screen_flow,Account,activated,2025-07-17T11:21:00Z
+Account - Update Parent Account(Custom) Field,account_update_parent_custom,When Parent Account field is updated then use this flow to update custom field Parent Account(Custom),record_triggered_after_save,Account,activated,2025-02-14T16:13:00Z
+Account: Update Account Name with Mailing Address,account_update_name_address_screen,,screen_flow,Account,activated,2025-06-24T16:17:00Z
+Add Case Comment,add_case_comment,Let a customer add a comment to an existing case,autolaunched,Case,activated,2025-06-14T07:54:00Z
+Add Lead to Cadence,add_lead_to_cadence,Adds the lead that triggered the flow to a specified cadence when the lead is created,record_triggered_after_save,Lead,draft,2025-06-14T07:54:00Z
+Add Payout Commissions,add_payout_commissions,,screen_flow,Commission,activated,2025-02-15T07:07:00Z
+Agentforce Chat Message Session Created,agentforce_chat_session,,record_triggered_after_save,Messaging_Session,activated,2025-09-15T15:57:00Z
+Agentforce: Case Creation,agentforce_case_creation,Update CaseID to Messaging Session related list,autolaunched,Case,activated,2025-05-28T12:30:00Z
+Agentforce: Create Case with Enhanced Data,agentforce_create_case_enhanced,,autolaunched,Case,draft,2025-06-05T09:18:00Z
+Agentforce: Lead Creation,agentforce_lead_creation,Handles the creation or update of Leads that interact with our Agentforce Service Agent,autolaunched,Lead,activated,2025-09-11T15:12:00Z
+Approval Process - Trigger Employee Referral Approval Process,approval_employee_referral,,record_triggered_after_save,Employee_Referral,activated,2024-10-12T04:54:00Z
+Approval Process - Trigger Event Bonus Approval Process,approval_event_bonus,,record_triggered_after_save,Event_Bonus,activated,2024-10-12T04:54:00Z
+Approvals Workflow: Evaluate Approval Requests,approvals_evaluate_requests,Evaluate advanced approval requests to approve or deny them while optionally leaving comments,screen_flow,Approval,activated,2025-06-14T07:54:00Z
+Approvals Workflow: Process Approval Submission,approvals_process_submission,Allows a user to process a submission for Standard Approvals or Advanced Approvals,screen_flow,Approval,activated,2025-06-14T07:54:00Z
+Approve a Deal,approve_deal,Allows a vendor to approve or reject a lead and updates the associated record with the selected status,screen_flow,Lead,activated,2025-06-14T07:54:00Z
+Aurora Design - Set Primary Aurora Design Record,aurora_design_set_primary,,record_triggered_after_save,Aurora_Design,activated,2024-10-12T04:53:00Z
+Aurora Design - Update Lease Info Record,aurora_design_update_lease,,record_triggered_after_save,Aurora_Design,activated,2024-10-12T04:53:00Z
+Aurora Design - Update Opportunity Estimated Production,aurora_design_update_production,,record_triggered_after_save,Aurora_Design,activated,2024-10-12T04:53:00Z
+Aurora Trigger - Check,aurora_trigger_check,Checks the Aurora Trigger Check box if Owner changes - excluded Service Opps,record_triggered_after_save,Opportunity,activated,2024-10-12T04:53:00Z
+Aurora Trigger - Uncheck,aurora_trigger_uncheck,Unchecks the box for Aurora Trigger after 1 minute,record_triggered_after_save,Opportunity,draft,2024-10-12T04:53:00Z

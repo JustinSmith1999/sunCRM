@@ -1,0 +1,20 @@
+{
+  "name": "Sunation CRM Integration",
+  "description": "Integration between Sunation CRM and Egnyte for document management and file synchronization",
+  "version": "1.0.0",
+  "redirect_uris": [
+    "https://husbupeealwuxyopfwwb.supabase.co/functions/v1/egnyte-oauth/callback"
+  ],
+  "scopes": [
+    "Egnyte.filesystem"
+  ],
+  "grant_types": [
+    "authorization_code",
+    "refresh_token"
+  ],
+  "response_types": [
+    "code"
+  ],
+  "token_endpoint_auth_method": "client_secret_post",
+  "application_type": "web"
+}
