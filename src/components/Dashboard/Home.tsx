@@ -226,14 +226,14 @@ export function Home({ onViewChange }: HomeProps) {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Executive Dashboard</h1>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Dashboard</h1>
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <button
           onClick={() => onViewChange?.('reports')}
-          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
         >
           <BarChart2 className="w-3.5 h-3.5" /> View Reports
         </button>
@@ -242,29 +242,29 @@ export function Home({ onViewChange }: HomeProps) {
       {/* ── KPI Row ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Pipeline */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('deals')}>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors" onClick={() => onViewChange?.('deals')}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Active Pipeline</span>
-            <DollarSign className="w-4 h-4 text-gray-300" />
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Active Pipeline</span>
+            <DollarSign className="w-4 h-4 text-zinc-300 dark:text-zinc-600" />
           </div>
-          <div className="text-2xl font-bold text-gray-900">{fmt$(kpis.pipeline)}</div>
+          <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{fmt$(kpis.pipeline)}</div>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-gray-400">{kpis.pipelineCount.toLocaleString()} opportunities</span>
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">{kpis.pipelineCount.toLocaleString()} opportunities</span>
           </div>
-          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+          <div className="mt-3 h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full">
             <div className="h-1 rounded-full" style={{ width: '65%', backgroundColor: BRAND.sky }} />
           </div>
         </div>
 
         {/* Won MTD */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('deals')}>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors" onClick={() => onViewChange?.('deals')}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Won This Month</span>
-            <CheckCircle className="w-4 h-4 text-gray-300" />
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Won This Month</span>
+            <CheckCircle className="w-4 h-4 text-zinc-300 dark:text-zinc-600" />
           </div>
-          <div className="text-2xl font-bold text-gray-900">{fmt$(kpis.wonMonth)}</div>
+          <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{fmt$(kpis.wonMonth)}</div>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-gray-400">{kpis.wonMonthCount} deals closed</span>
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">{kpis.wonMonthCount} deals closed</span>
             {kpis.wonMTDvsPrev !== 0 && (
               <span className={`flex items-center gap-0.5 text-xs font-medium ${kpis.wonMTDvsPrev >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {kpis.wonMTDvsPrev >= 0 ? <ArrowUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -272,44 +272,44 @@ export function Home({ onViewChange }: HomeProps) {
               </span>
             )}
           </div>
-          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+          <div className="mt-3 h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full">
             <div className="h-1 rounded-full" style={{ width: `${Math.min((kpis.wonMonthCount / 50) * 100, 100)}%`, backgroundColor: BRAND.gold }} />
           </div>
         </div>
 
         {/* Open Cases */}
         <div
-          className={`bg-white rounded-xl border p-4 cursor-pointer transition-colors ${kpis.openCasesUrgent > 0 ? 'border-red-200 hover:border-red-300' : 'border-gray-100 hover:border-sky-200'}`}
+          className={`bg-white rounded-xl border p-4 cursor-pointer transition-colors ${kpis.openCasesUrgent > 0 ? 'border-red-200 hover:border-red-300' : 'border-gray-100 hover:border-zinc-300 dark:hover:border-zinc-700'}`}
           onClick={() => onViewChange?.('cases')}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Open Cases</span>
-            <AlertCircle className={`w-4 h-4 ${kpis.openCasesUrgent > 0 ? 'text-red-400' : 'text-gray-300'}`} />
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Open Cases</span>
+            <AlertCircle className={`w-4 h-4 ${kpis.openCasesUrgent > 0 ? 'text-red-400' : 'text-zinc-300 dark:text-zinc-600'}`} />
           </div>
-          <div className="text-2xl font-bold text-gray-900">{kpis.openCases.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{kpis.openCases.toLocaleString()}</div>
           <div className="flex items-center gap-2 mt-1">
             {kpis.openCasesUrgent > 0 ? (
               <span className="text-xs font-medium text-red-500">{kpis.openCasesUrgent} high priority</span>
             ) : (
-              <span className="text-xs text-gray-400">No high-priority cases</span>
+              <span className="text-xs text-zinc-400 dark:text-zinc-500">No high-priority cases</span>
             )}
           </div>
-          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+          <div className="mt-3 h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full">
             <div className="h-1 rounded-full bg-red-400" style={{ width: `${Math.min((kpis.openCasesUrgent / Math.max(kpis.openCases, 1)) * 100, 100)}%` }} />
           </div>
         </div>
 
         {/* Accounts */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('accounts')}>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors" onClick={() => onViewChange?.('accounts')}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Accounts</span>
-            <Building2 className="w-4 h-4 text-gray-300" />
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Accounts</span>
+            <Building2 className="w-4 h-4 text-zinc-300 dark:text-zinc-600" />
           </div>
-          <div className="text-2xl font-bold text-gray-900">{kpis.accounts.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{kpis.accounts.toLocaleString()}</div>
           <div className="flex items-center gap-4 mt-1">
-            <span className="text-xs text-gray-400">{kpis.avgDeal > 0 ? `Avg deal ${fmt$(kpis.avgDeal)}` : 'Total customer base'}</span>
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">{kpis.avgDeal > 0 ? `Avg deal ${fmt$(kpis.avgDeal)}` : 'Total customer base'}</span>
           </div>
-          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+          <div className="mt-3 h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full">
             <div className="h-1 rounded-full" style={{ width: '80%', backgroundColor: BRAND.navy }} />
           </div>
         </div>
@@ -317,39 +317,39 @@ export function Home({ onViewChange }: HomeProps) {
 
       {/* ── Secondary Metrics Row ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('leads')}>
-          <div className="text-xs text-gray-400 mb-1">Leads This Month</div>
-          <div className="text-lg font-bold text-gray-900">{kpis.leadsMonth.toLocaleString()}</div>
-          <div className="text-xs text-gray-400">{kpis.leadsWeek} this week</div>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 py-3 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors" onClick={() => onViewChange?.('leads')}>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">Leads This Month</div>
+          <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{kpis.leadsMonth.toLocaleString()}</div>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500">{kpis.leadsWeek} this week</div>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('deals')}>
-          <div className="text-xs text-gray-400 mb-1">Conversion Rate</div>
-          <div className="text-lg font-bold text-gray-900">{kpis.conversionRate.toFixed(1)}%</div>
-          <div className="text-xs text-gray-400">Won / (Won + Lost)</div>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 py-3 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors" onClick={() => onViewChange?.('deals')}>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">Conversion Rate</div>
+          <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{kpis.conversionRate.toFixed(1)}%</div>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500">Won / (Won + Lost)</div>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('permit-management')}>
-          <div className="text-xs text-gray-400 mb-1">Open Permits</div>
-          <div className="text-lg font-bold text-gray-900">{kpis.openPermits.toLocaleString()}</div>
-          <div className="text-xs text-gray-400">Awaiting approval</div>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 py-3 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors" onClick={() => onViewChange?.('permit-management')}>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">Open Permits</div>
+          <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{kpis.openPermits.toLocaleString()}</div>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500">Awaiting approval</div>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('quotes')}>
-          <div className="text-xs text-gray-400 mb-1">Total Quotes</div>
-          <div className="text-lg font-bold text-gray-900">{kpis.totalQuotes.toLocaleString()}</div>
-          <div className="text-xs text-gray-400">In system</div>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 py-3 cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors" onClick={() => onViewChange?.('quotes')}>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">Total Quotes</div>
+          <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{kpis.totalQuotes.toLocaleString()}</div>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500">In system</div>
         </div>
       </div>
 
       {/* ── Charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Revenue trend — spans 2 cols */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-4">
+        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-sm font-semibold text-gray-900">Monthly Revenue (Won Deals)</div>
-              <div className="text-xs text-gray-400 mt-0.5">Last 12 months</div>
+              <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Monthly Revenue (Won Deals)</div>
+              <div className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Last 12 months</div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-bold text-gray-900">{fmt$(thisMonthRevenue)}</div>
+              <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{fmt$(thisMonthRevenue)}</div>
               {revTrend !== 0 && (
                 <div className={`text-xs font-medium flex items-center gap-0.5 justify-end ${revTrend >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                   {revTrend >= 0 ? <ArrowUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -379,11 +379,11 @@ export function Home({ onViewChange }: HomeProps) {
         </div>
 
         {/* Stage breakdown */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <div className="text-sm font-semibold text-gray-900 mb-1">Pipeline by Stage</div>
-          <div className="text-xs text-gray-400 mb-4">Active opportunities</div>
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Pipeline by Stage</div>
+          <div className="text-xs text-zinc-400 dark:text-zinc-500 mb-4">Active opportunities</div>
           {stageBreakdown.length === 0 ? (
-            <div className="flex items-center justify-center h-36 text-gray-300 text-sm">No data</div>
+            <div className="flex items-center justify-center h-36 text-zinc-300 dark:text-zinc-600 text-sm">No data</div>
           ) : (
             <div className="space-y-3">
               {stageBreakdown.map(s => {
@@ -394,14 +394,14 @@ export function Home({ onViewChange }: HomeProps) {
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageDotColor[s.stage] || BRAND.sky }} />
-                        <span className="text-xs text-gray-600">{s.stage}</span>
+                        <span className="text-xs text-zinc-600 dark:text-zinc-400">{s.stage}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-400">{s.count}</span>
+                        <span className="text-xs text-zinc-400 dark:text-zinc-500">{s.count}</span>
                         <span className="text-xs font-semibold text-gray-700">{fmt$(s.value)}</span>
                       </div>
                     </div>
-                    <div className="h-1.5 bg-gray-100 rounded-full">
+                    <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full">
                       <div className="h-1.5 rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: stageDotColor[s.stage] || BRAND.sky }} />
                     </div>
                   </div>
@@ -415,10 +415,10 @@ export function Home({ onViewChange }: HomeProps) {
       {/* ── Data Tables ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recently Modified Opportunities */}
-        <div className="bg-white rounded-xl border border-gray-100">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-            <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <Activity className="w-3.5 h-3.5 text-gray-400" /> Recent Activity
+            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <Activity className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Recent Activity
             </div>
             <button onClick={() => onViewChange?.('deals')} className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-0.5">
               View all <ArrowRight className="w-3 h-3" />
@@ -426,19 +426,19 @@ export function Home({ onViewChange }: HomeProps) {
           </div>
           <div className="divide-y divide-gray-50">
             {recentOpps.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-gray-300">No recent opportunities</div>
+              <div className="px-4 py-6 text-center text-sm text-zinc-300 dark:text-zinc-600">No recent opportunities</div>
             ) : recentOpps.map(o => {
               const cat = classifyStage(o.StageName);
               return (
                 <div key={o.Id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer">
                   <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: stageDotColor[cat] || '#94a3b8' }} />
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 truncate">{o.Name || '—'}</div>
-                    <div className="text-xs text-gray-400 truncate">{o.StageName}</div>
+                    <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{o.Name || '—'}</div>
+                    <div className="text-xs text-zinc-400 dark:text-zinc-500 truncate">{o.StageName}</div>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="text-sm font-semibold text-gray-800">{o.Amount ? fmt$(parseFloat(o.Amount)) : '—'}</div>
-                    <div className="text-xs text-gray-400">{o.LastModifiedDate ? fmtRelative(o.LastModifiedDate) : '—'}</div>
+                    <div className="text-xs text-zinc-400 dark:text-zinc-500">{o.LastModifiedDate ? fmtRelative(o.LastModifiedDate) : '—'}</div>
                   </div>
                 </div>
               );
@@ -447,10 +447,10 @@ export function Home({ onViewChange }: HomeProps) {
         </div>
 
         {/* Top Open Opportunities */}
-        <div className="bg-white rounded-xl border border-gray-100">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-            <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <TrendingUp className="w-3.5 h-3.5 text-gray-400" /> Top Open Opportunities
+            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <TrendingUp className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Top Open Opportunities
             </div>
             <button onClick={() => onViewChange?.('deals')} className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-0.5">
               View all <ArrowRight className="w-3 h-3" />
@@ -458,7 +458,7 @@ export function Home({ onViewChange }: HomeProps) {
           </div>
           <div className="divide-y divide-gray-50">
             {topOpps.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-gray-300">No open opportunities</div>
+              <div className="px-4 py-6 text-center text-sm text-zinc-300 dark:text-zinc-600">No open opportunities</div>
             ) : topOpps.map((o, i) => {
               const cat = classifyStage(o.StageName);
               return (
@@ -467,12 +467,12 @@ export function Home({ onViewChange }: HomeProps) {
                     {i + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 truncate">{o.Name || '—'}</div>
-                    <div className="text-xs text-gray-400 truncate">{o.StageName}</div>
+                    <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{o.Name || '—'}</div>
+                    <div className="text-xs text-zinc-400 dark:text-zinc-500 truncate">{o.StageName}</div>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="text-sm font-bold" style={{ color: BRAND.navy }}>{o.Amount ? fmt$(parseFloat(o.Amount)) : '—'}</div>
-                    {o.CloseDate && <div className="text-xs text-gray-400">Close {o.CloseDate}</div>}
+                    {o.CloseDate && <div className="text-xs text-zinc-400 dark:text-zinc-500">Close {o.CloseDate}</div>}
                   </div>
                 </div>
               );
@@ -484,10 +484,10 @@ export function Home({ onViewChange }: HomeProps) {
       {/* ── Leads + Cases ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Leads */}
-        <div className="bg-white rounded-xl border border-gray-100">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-            <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <Users className="w-3.5 h-3.5 text-gray-400" /> Recent Leads
+            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Recent Leads
             </div>
             <button onClick={() => onViewChange?.('leads')} className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-0.5">
               View all <ArrowRight className="w-3 h-3" />
@@ -495,21 +495,21 @@ export function Home({ onViewChange }: HomeProps) {
           </div>
           <div className="divide-y divide-gray-50">
             {recentLeads.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-gray-300">No recent leads</div>
+              <div className="px-4 py-6 text-center text-sm text-zinc-300 dark:text-zinc-600">No recent leads</div>
             ) : recentLeads.map(l => (
               <div key={l.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer">
                 <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ backgroundColor: BRAND.sky }}>
                   {((l.FirstName?.[0] || '') + (l.LastName?.[0] || '')).toUpperCase() || '?'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-900 truncate">
+                  <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
                     {[l.FirstName, l.LastName].filter(Boolean).join(' ') || '—'}
                   </div>
-                  <div className="text-xs text-gray-400 truncate">{l.Company || l.LeadSource || '—'}</div>
+                  <div className="text-xs text-zinc-400 dark:text-zinc-500 truncate">{l.Company || l.LeadSource || '—'}</div>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <div className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{l.Status || 'New'}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{l.created_at ? fmtRelative(l.created_at) : '—'}</div>
+                  <div className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{l.created_at ? fmtRelative(l.created_at) : '—'}</div>
                 </div>
               </div>
             ))}
@@ -517,10 +517,10 @@ export function Home({ onViewChange }: HomeProps) {
         </div>
 
         {/* Open Cases Summary */}
-        <div className="bg-white rounded-xl border border-gray-100">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-            <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <AlertCircle className="w-3.5 h-3.5 text-gray-400" /> Case Summary
+            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <AlertCircle className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Case Summary
             </div>
             <button onClick={() => onViewChange?.('cases')} className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-0.5">
               View all <ArrowRight className="w-3 h-3" />
@@ -530,22 +530,22 @@ export function Home({ onViewChange }: HomeProps) {
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center p-3 rounded-lg bg-gray-50">
-                <div className="text-lg font-bold text-gray-900">{kpis.openCases.toLocaleString()}</div>
-                <div className="text-xs text-gray-400">Total Open</div>
+                <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{kpis.openCases.toLocaleString()}</div>
+                <div className="text-xs text-zinc-400 dark:text-zinc-500">Total Open</div>
               </div>
               <div className="text-center p-3 rounded-lg bg-red-50">
                 <div className="text-lg font-bold text-red-600">{kpis.openCasesUrgent}</div>
                 <div className="text-xs text-red-400">High Priority</div>
               </div>
               <div className="text-center p-3 rounded-lg bg-gray-50">
-                <div className="text-lg font-bold text-gray-900">{Math.max(0, kpis.openCases - kpis.openCasesUrgent)}</div>
-                <div className="text-xs text-gray-400">Normal</div>
+                <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{Math.max(0, kpis.openCases - kpis.openCasesUrgent)}</div>
+                <div className="text-xs text-zinc-400 dark:text-zinc-500">Normal</div>
               </div>
             </div>
 
             {urgentCases.length > 0 ? (
               <div>
-                <div className="text-xs font-medium text-gray-500 mb-2">High Priority</div>
+                <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-2">High Priority</div>
                 <div className="space-y-1.5">
                   {urgentCases.map(c => (
                     <div key={c.Id} className="flex items-center gap-2 text-sm">

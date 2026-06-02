@@ -3,41 +3,52 @@
 @tailwind utilities;
 
 @layer base {
-  /* Optimize tap targets for mobile */
-  * {
-    -webkit-tap-highlight-color: rgba(251, 191, 36, 0.2);
-  }
-
-  /* Smooth scrolling for better mobile experience */
   html {
-    scroll-behavior: smooth;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    color-scheme: light dark;
+    background: #FFFFFF;
+    color: #18181B;            /* zinc-900 */
+  }
+  html.dark {
+    background: #0A0A0A;
+    color: #FAFAFA;            /* zinc-50 */
   }
 
-  /* Prevent zoom on input focus in iOS */
-  input, select, textarea {
-    font-size: 16px;
+  /* Smooth scroll, comfortable tap target on touch. */
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: rgba(0, 174, 239, 0.18);
   }
 
-  /* Better touch scrolling on iOS */
-  body {
-    -webkit-overflow-scrolling: touch;
+  /* Prevent iOS auto-zoom on input focus. */
+  input, select, textarea { font-size: 16px; }
+
+  /* SF Pro Display for headlines — apply via `font-display` utility. */
+  .font-display {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro', system-ui, 'Segoe UI', sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* Tabular numerics for prices / counts / dates. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hairlines look like true 1px on retina; ½px on hi-dpi. */
+  hr, .hairline {
+    border-color: #E4E4E7;     /* zinc-200 */
+    border-width: 0.5px;
+  }
+  .dark hr, .dark .hairline {
+    border-color: #27272A;     /* zinc-800 */
   }
 }
 
 @layer utilities {
-  /* Touch-friendly utilities */
-  .touch-manipulation {
-    touch-action: manipulation;
-  }
-
-  /* Safe area insets for iOS notch */
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  .touch-manipulation { touch-action: manipulation; }
+  .safe-top    { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 }

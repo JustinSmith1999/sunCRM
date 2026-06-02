@@ -183,58 +183,47 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-yellow-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-amber-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
-
-      <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 sm:p-10 lg:p-12 w-full max-w-md border border-slate-200/50">
-        {/* Header */}
+    <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        {/* Header — quiet, centered, no decoration */}
         <div className="text-center mb-8">
           <img
             src="https://husbupeealwuxyopfwwb.supabase.co/storage/v1/object/public/logos/03018223-ac24-400d-acbc-2c1480a05441.webp"
-            alt="Logo"
-            className="w-36 h-36 sm:w-44 sm:h-44 object-contain mx-auto drop-shadow-xl"
+            alt=""
+            className="w-12 h-12 object-contain mx-auto"
           />
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-6 mb-2">Welcome Back</h1>
-          <p className="text-slate-500">Sign in to access your dashboard</p>
+          <h1 className="font-display text-2xl font-semibold text-zinc-900 dark:text-zinc-50 mt-6 tracking-tight">Sign in</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">to your sunCRM account</p>
         </div>
 
-        {/* Lockout Message */}
         {isLocked && lockoutMessage && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-orange-50/50 border border-orange-300 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-            <Shield className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+          <div className="mb-5 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex items-start gap-2.5 text-sm">
+            <Shield className="w-4 h-4 text-zinc-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-orange-900 text-sm font-semibold mb-1">Account Locked</p>
-              <p className="text-orange-800 text-sm leading-relaxed">{lockoutMessage}</p>
+              <p className="font-medium text-zinc-900 dark:text-zinc-100">Account locked</p>
+              <p className="text-zinc-600 dark:text-zinc-400 mt-0.5">{lockoutMessage}</p>
             </div>
           </div>
         )}
 
-        {/* Error Message */}
         {error && !isLocked && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-red-50/50 border border-red-200 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-red-800 text-sm leading-relaxed">{error}</p>
+          <div className="mb-5 p-3 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 flex items-start gap-2.5 text-sm">
+            <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 text-red-700 dark:text-red-300">
+              <p>{error}</p>
               {remainingAttempts !== null && remainingAttempts > 0 && (
-                <div className="mt-2 pt-2 border-t border-red-200">
-                  <p className="text-red-700 text-xs font-medium">
-                    Warning: {remainingAttempts} {remainingAttempts === 1 ? 'attempt' : 'attempts'} remaining before 30-minute lockout
-                  </p>
-                </div>
+                <p className="text-xs mt-1 text-red-600 dark:text-red-400">
+                  {remainingAttempts} {remainingAttempts === 1 ? 'attempt' : 'attempts'} remaining before lockout.
+                </p>
               )}
             </div>
           </div>
         )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="group">
-            <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
-              Email Address
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+              Email
             </label>
             <input
               id="email"
@@ -242,13 +231,14 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3.5 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-slate-900 placeholder:text-slate-400 bg-white/50"
-              placeholder="you@company.com"
+              className="w-full h-10 px-3 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+              placeholder="you@sunation.com"
+              autoComplete="email"
             />
           </div>
 
-          <div className="group">
-            <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
+          <div>
+            <label htmlFor="password" className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
               Password
             </label>
             <input
@@ -257,32 +247,30 @@ export function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3.5 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-slate-900 placeholder:text-slate-400 bg-white/50"
+              className="w-full h-10 px-3 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
               placeholder="••••••••"
+              autoComplete="current-password"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading || isLocked}
-            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:from-slate-300 disabled:to-slate-300 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:shadow-none"
+            className="w-full h-10 bg-blue-500 hover:bg-blue-600 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-medium text-sm rounded-lg transition-colors flex items-center justify-center"
           >
             {loading ? (
-              <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
             ) : isLocked ? (
-              'Account Locked'
+              'Account locked'
             ) : (
-              'Sign In'
+              'Sign in'
             )}
           </button>
         </form>
 
-        {/* Footer decoration */}
-        <div className="mt-8 pt-6 border-t border-slate-200">
-          <p className="text-center text-xs text-slate-400">
-            Secure authentication powered by advanced encryption
-          </p>
-        </div>
+        <p className="text-center text-xs text-zinc-400 dark:text-zinc-600 mt-8">
+          SUNation Energy · Ronkonkoma, NY
+        </p>
       </div>
 
       {/* Password Change Modal */}

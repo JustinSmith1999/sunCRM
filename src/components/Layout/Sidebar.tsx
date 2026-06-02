@@ -476,43 +476,34 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
         />
       )}
 
-      <div className={`bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white transition-all duration-300 flex flex-col border-r border-slate-800
-        ${collapsed ? 'w-16' : 'w-64'}
+      <div className={`bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col border-r border-zinc-200 dark:border-zinc-800 transition-[width] duration-200 ease-out
+        ${collapsed ? 'w-16' : 'w-60'}
         ${showOnMobile
-          ? 'fixed top-0 left-0 h-full w-64 z-50 shadow-2xl'
+          ? 'fixed top-0 left-0 h-full w-60 z-50'
           : 'hidden'
         }
         md:flex md:fixed md:left-0 md:top-0 md:h-screen
       `}>
-      <div className="p-2 border-b border-slate-700">
-        <div className="flex flex-col items-center gap-1">
-          <img
-            src="https://husbupeealwuxyopfwwb.supabase.co/storage/v1/object/public/logos/03018223-ac24-400d-acbc-2c1480a05441.webp"
-            alt="Logo"
-            className={`object-contain transition-all duration-300 ${
-              collapsed ? 'w-8 h-8' : 'w-12 h-12'
-            }`}
-          />
-          {!collapsed && (
-            <div className="text-center">
-              <h2 className="text-white font-semibold text-sm">Admin Console</h2>
-            </div>
-          )}
-        </div>
-
+      {/* Brand */}
+      <div className="px-3 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2.5">
+        <img
+          src="https://husbupeealwuxyopfwwb.supabase.co/storage/v1/object/public/logos/03018223-ac24-400d-acbc-2c1480a05441.webp"
+          alt=""
+          className="w-7 h-7 object-contain shrink-0"
+        />
+        {!collapsed && (
+          <span className="font-display text-[15px] font-semibold tracking-tight">sunCRM</span>
+        )}
         <button
           onClick={onToggleCollapsed}
-          className="hidden md:flex items-center justify-center w-6 h-6 bg-slate-800 hover:bg-slate-700 rounded mt-2 ml-auto transition-colors"
+          className="hidden md:flex items-center justify-center w-6 h-6 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 ml-auto transition-colors"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4 text-slate-400" />
-          ) : (
-            <ChevronLeft className="w-4 h-4 text-slate-400" />
-          )}
+          {collapsed ? <ChevronRight className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronLeft className="w-3.5 h-3.5 text-zinc-500" />}
         </button>
       </div>
 
-      <nav className="flex-1 p-2 overflow-y-auto">
+      <nav className="flex-1 px-2 py-3 overflow-y-auto">
         <ul className="space-y-0.5">
           {visibleMenuItems.map((item) => {
             const Icon = item.icon;
@@ -521,9 +512,7 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
             const isExpanded = isGroupExpanded(item.id);
             const isActive = isItemActive(item.id, visibleChildren);
 
-            if (hasChildren && visibleChildren.length === 0) {
-              return null;
-            }
+            if (hasChildren && visibleChildren.length === 0) return null;
 
             return (
               <li key={item.id}>
@@ -538,45 +527,31 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
                           toggleGroup(item.id);
                         }
                       }}
-                      className={`w-full flex items-center ${collapsed ? 'justify-center' : 'justify-between'} px-2 py-1.5 rounded-lg transition-all border-l-2 ${
+                      className={`w-full flex items-center ${collapsed ? 'justify-center' : 'justify-between'} px-2 h-8 rounded-md transition-colors ${
                         isActive
-                          ? 'bg-slate-800/50 text-white border-amber-500'
-                          : 'hover:bg-slate-800/30 text-slate-300 border-transparent hover:border-slate-700'
+                          ? 'text-zinc-900 dark:text-zinc-50'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900'
                       }`}
                     >
-                      <div className={`flex items-center ${collapsed ? '' : 'gap-2'}`}>
+                      <div className={`flex items-center ${collapsed ? '' : 'gap-2.5'}`}>
                         <Icon className="w-4 h-4 flex-shrink-0" />
-                        {!collapsed && (
-                          <span className="text-sm font-medium">
-                            {item.label}
-                          </span>
-                        )}
+                        {!collapsed && <span className="text-[13px] font-medium">{item.label}</span>}
                       </div>
-                      {!collapsed && (
-                        isExpanded ? (
-                          <ChevronUp className="w-3 h-3" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3" />
-                        )
-                      )}
+                      {!collapsed && (isExpanded ? <ChevronUp className="w-3 h-3 text-zinc-400" /> : <ChevronDown className="w-3 h-3 text-zinc-400" />)}
                     </button>
                     {isExpanded && !collapsed && (
-                      <ul className="ml-4 mt-0.5 space-y-0.5 border-l border-slate-700 pl-2">
+                      <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-zinc-200 dark:border-zinc-800 pl-2">
                         {visibleChildren.map((child) => {
                           const ChildIcon = child.icon;
                           const isChildActive = currentView === child.id;
-
                           return (
                             <li key={child.id}>
                               <button
-                                onClick={() => {
-                                  onViewChange(child.id);
-                                  onCloseMobile();
-                                }}
-                                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all text-sm border-l-2 ${
+                                onClick={() => { onViewChange(child.id); onCloseMobile(); }}
+                                className={`w-full flex items-center gap-2.5 px-2 h-7 rounded-md transition-colors text-[13px] ${
                                   isChildActive
-                                    ? 'bg-blue-500/20 text-white font-semibold border-blue-500'
-                                    : 'hover:bg-slate-800/30 text-slate-400 hover:text-slate-300 border-transparent'
+                                    ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-medium'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900'
                                 }`}
                               >
                                 <ChildIcon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -590,22 +565,15 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
                   </>
                 ) : (
                   <button
-                    onClick={() => {
-                      onViewChange(item.id);
-                      onCloseMobile();
-                    }}
-                    className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-2'} px-2 py-1.5 rounded-lg transition-all active:scale-95 border-l-2 ${
+                    onClick={() => { onViewChange(item.id); onCloseMobile(); }}
+                    className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-2.5'} px-2 h-8 rounded-md transition-colors ${
                       isActive
-                        ? 'bg-blue-500/20 text-white font-semibold border-blue-500'
-                        : 'hover:bg-slate-800/30 text-slate-300 hover:text-white border-transparent hover:border-slate-700'
+                        ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-medium'
+                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900'
                     }`}
                   >
                     <Icon className="w-4 h-4 flex-shrink-0" />
-                    {!collapsed && (
-                      <span className="text-sm transition-opacity duration-300">
-                        {item.label}
-                      </span>
-                    )}
+                    {!collapsed && <span className="text-[13px] font-medium">{item.label}</span>}
                   </button>
                 )}
               </li>
@@ -614,32 +582,31 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
         </ul>
       </nav>
 
-      <div className="p-2 border-t border-slate-800">
-        <div className="mb-2">
-          <div className="flex items-center gap-2 mb-2 px-2 py-2">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-slate-700">
-              <User className="w-5 h-5 text-white" />
-            </div>
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold truncate text-white">
-                  {profile?.full_name || profile?.email}
-                </div>
-                <div className="text-xs truncate capitalize px-2 py-0.5 rounded-full inline-block bg-blue-500/20 text-blue-400 font-medium mt-1">
-                  {profile?.role?.replace('_', ' ')}
-                </div>
-              </div>
-            )}
+      {/* Footer: user + sign out */}
+      <div className="px-2 py-3 border-t border-zinc-200 dark:border-zinc-800">
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2.5'} px-2 py-1.5`}>
+          <div className="w-7 h-7 bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center justify-center flex-shrink-0">
+            <User className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
           </div>
+          {!collapsed && (
+            <div className="flex-1 min-w-0">
+              <div className="text-[12px] font-medium truncate text-zinc-900 dark:text-zinc-100">
+                {profile?.full_name || profile?.email}
+              </div>
+              <div className="text-[11px] truncate capitalize text-zinc-500 dark:text-zinc-500">
+                {profile?.role?.replace('_', ' ')}
+              </div>
+            </div>
+          )}
         </div>
 
         <button
           onClick={signOut}
-          className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-2'} py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-all active:scale-95`}
+          className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-2.5'} px-2 h-8 rounded-md text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors mt-1`}
           title={collapsed ? 'Sign Out' : ''}
         >
-          <LogOut className="w-4 h-4" />
-          {!collapsed && <span className="text-sm">Sign Out</span>}
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          {!collapsed && <span className="text-[13px] font-medium">Sign out</span>}
         </button>
       </div>
       </div>

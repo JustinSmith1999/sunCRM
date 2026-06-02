@@ -29,10 +29,10 @@ interface Account {
 /* ─────────────────────────────────────────────────────────────────────────────
  *  PullSheets — list + filter + printable detail.
  *  Replaces the .xlsm warehouse pull sheet workflow.
- *   - Type a Job # → jump straight to that printable sheet (the operator flow)
- *   - OR pick from a list filtered by install date (the planner flow)
- *   - "Print all" produces a multi-page sheet, page-break per job
- *  Styled to match the original Bolt sunCRM admin theme.
+ *    Type Job # → opens that sheet directly (matches Excel muscle memory)
+ *    Date filter → list of jobs scheduled in that window
+ *    Print one, or print many at once.
+ *  v3 styling: neutral surfaces, single sky-blue accent, light + dark.
  * ────────────────────────────────────────────────────────────────────────── */
 export function PullSheets() {
   const [from, setFrom] = useState<string>(() => isoDate(addDays(new Date(), -90)));
@@ -63,26 +63,17 @@ export function PullSheets() {
       .order('Install_Scheduled_Date__c', { ascending: true })
       .limit(500);
 
-    if (error) {
-      console.error('PullSheets load error', error);
-      setOpps([]); setAccounts(new Map()); setLoading(false);
-      return;
-    }
+    if (error) { console.error(error); setOpps([]); setAccounts(new Map()); setLoading(false); return; }
     const rows = (data ?? []) as Opp[];
     setOpps(rows);
 
     const accountIds = Array.from(new Set(rows.map((r) => r.AccountId).filter(Boolean) as string[]));
     if (accountIds.length) {
-      const { data: accs } = await supabase
-        .from('accounts')
-        .select('Id, Name, Phone')
-        .in('Id', accountIds);
+      const { data: accs } = await supabase.from('accounts').select('Id, Name, Phone').in('Id', accountIds);
       const map = new Map<string, Account>();
       (accs ?? []).forEach((a) => map.set(a.Id, a as Account));
       setAccounts(map);
-    } else {
-      setAccounts(new Map());
-    }
+    } else setAccounts(new Map());
     setLoading(false);
   };
 
@@ -137,16 +128,10 @@ export function PullSheets() {
   }, [filtered]);
 
   const openJob = (id: string) => { setOpenId(id); setMode('detail'); };
-  const toggleSel = (id: string) => {
-    setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  };
+  const toggleSel = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const selectAllVisible = () => setSelected(new Set(filtered.map((o) => o.Id)));
   const clearSel = () => setSelected(new Set());
-  const printAllSelected = () => {
-    if (selected.size === 0) selectAllVisible();
-    setMode('printAll');
-    setTimeout(() => window.print(), 80);
-  };
+  const printAllSelected = () => { if (selected.size === 0) selectAllVisible(); setMode('printAll'); setTimeout(() => window.print(), 80); };
 
   /* ─── detail ─── */
   if (mode === 'detail' && openId) {
@@ -154,24 +139,22 @@ export function PullSheets() {
     if (!opp) return null;
     const acc = openAcc ?? (opp.AccountId ? accounts.get(opp.AccountId) ?? null : null);
     return (
-      <div className="p-6 max-w-5xl mx-auto">
+      <div className="p-6 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6 no-print">
           <button
             onClick={() => { setMode('list'); setOpenOpp(null); setOpenAcc(null); setOpenId(null); }}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-500 transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" /> Back to list
+            <ChevronLeft className="w-4 h-4" /> Back
           </button>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold shadow-lg transition-all"
+            className="inline-flex items-center gap-2 px-4 h-9 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors"
           >
-            <Printer className="w-4 h-4" /> Print this sheet
+            <Printer className="w-4 h-4" /> Print sheet
           </button>
         </div>
-        <div className="print-area">
-          <PullSheetPrintable opp={opp} account={acc} />
-        </div>
+        <div className="print-area"><PullSheetPrintable opp={opp} account={acc} /></div>
         <PrintCSS />
       </div>
     );
@@ -183,13 +166,13 @@ export function PullSheets() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-between mb-4 no-print">
-          <button onClick={() => setMode('list')} className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600">
-            <ChevronLeft className="w-4 h-4" /> Back to list
+          <button onClick={() => setMode('list')} className="inline-flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-500">
+            <ChevronLeft className="w-4 h-4" /> Back
           </button>
-          <div className="text-sm text-gray-500">Print preview: {rows.length} sheet{rows.length === 1 ? '' : 's'}</div>
+          <div className="text-sm text-zinc-500 dark:text-zinc-400">Print preview · {rows.length} sheet{rows.length === 1 ? '' : 's'}</div>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold shadow-lg transition-all"
+            className="inline-flex items-center gap-2 px-4 h-9 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors"
           >
             <Printer className="w-4 h-4" /> Print {rows.length}
           </button>
@@ -206,43 +189,42 @@ export function PullSheets() {
 
   /* ─── list ─── */
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-5">
 
-      {/* Page header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Pull Sheets</h1>
-          <p className="text-gray-500 mt-1 text-sm">Warehouse pick lists for jobs scheduled to install. Live from Supabase.</p>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Pull Sheets</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Warehouse pick lists. Live from Supabase.</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={load}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 text-sm font-semibold transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-sm font-medium transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
           <button
             onClick={printAllSelected}
             disabled={filtered.length === 0}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold shadow-lg transition-all disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
           >
-            <Printer className="w-4 h-4" /> Print {selected.size > 0 ? selected.size : `all ${filtered.length}`}
+            <Printer className="w-3.5 h-3.5" /> Print {selected.size > 0 ? selected.size : `all ${filtered.length}`}
           </button>
         </div>
       </div>
 
-      {/* Job # quick lookup — primary entry point, matches Excel muscle memory */}
+      {/* Quick lookup */}
       <form
         onSubmit={(e) => { e.preventDefault(); lookupJob(lookupValue); }}
-        className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200"
+        className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4"
       >
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Type a Job # to open its Pull Sheet
+        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+          Open a Pull Sheet by Job Number
         </label>
-        <div className="flex flex-wrap gap-3">
-          <div className="relative flex-1 min-w-[260px]">
-            <Hash className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="flex flex-wrap gap-2">
+          <div className="relative flex-1 min-w-[240px]">
+            <Hash className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               ref={lookupRef}
               type="text"
@@ -252,135 +234,126 @@ export function PullSheets() {
               value={lookupValue}
               onChange={(e) => { setLookupValue(e.target.value); setLookupError(null); }}
               placeholder="e.g. 25734"
-              className="w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base font-semibold"
+              className="w-full h-10 pl-9 pr-3 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium tabular"
             />
           </div>
           <button
             type="submit"
             disabled={lookupBusy || !lookupValue.trim()}
-            className="inline-flex items-center gap-2 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-lg disabled:opacity-50 transition-all"
+            className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
           >
             {lookupBusy
-              ? <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              : <ArrowRight className="w-4 h-4" />}
-            Open Sheet
+              ? <span className="inline-block w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              : <ArrowRight className="w-3.5 h-3.5" />}
+            Open
           </button>
         </div>
-        {lookupError && <div className="text-sm text-red-600 mt-2 font-medium">{lookupError}</div>}
+        {lookupError && <div className="text-xs text-red-600 dark:text-red-400 mt-2 font-medium">{lookupError}</div>}
       </form>
 
-      {/* Filter bar */}
-      <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-        <div className="flex flex-wrap items-end gap-4">
+      {/* Date filter */}
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+        <div className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1.5">Install date — from</label>
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">From</label>
             <div className="relative">
-              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-                className="pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <Calendar className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)}
+                className="h-9 pl-8 pr-2.5 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1.5">To</label>
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">To</label>
             <div className="relative">
-              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-              <input
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                className="pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <Calendar className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+              <input type="date" value={to} onChange={(e) => setTo(e.target.value)}
+                className="h-9 pl-8 pr-2.5 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             </div>
           </div>
-          <div className="flex-1 min-w-[240px]">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1.5">Search</label>
+          <div className="flex-1 min-w-[220px]">
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Search</label>
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Job #, opportunity name, or address"
-                className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+                placeholder="Job #, name, or address"
+                className="w-full h-9 pl-8 pr-2.5 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 text-sm placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <ChipButton onClick={() => { setFrom(isoDate(addDays(new Date(), -30))); setTo(isoDate(new Date())); }}>Last 30</ChipButton>
-            <ChipButton onClick={() => { setFrom(isoDate(addDays(new Date(), -90))); setTo(isoDate(new Date())); }}>Last 90</ChipButton>
-            <ChipButton onClick={() => { setFrom(isoDate(new Date())); setTo(isoDate(addDays(new Date(), 7))); }}>Next 7</ChipButton>
-            <ChipButton onClick={() => { setFrom(isoDate(new Date())); setTo(isoDate(addDays(new Date(), 30))); }}>Next 30</ChipButton>
+          <div className="flex gap-1.5 flex-wrap">
+            {[
+              ['Last 30',  -30, 0],
+              ['Last 90',  -90, 0],
+              ['Next 7',   0,   7],
+              ['Next 30',  0,   30],
+            ].map(([label, a, b]) => (
+              <button key={label as string}
+                onClick={() => { setFrom(isoDate(addDays(new Date(), a as number))); setTo(isoDate(addDays(new Date(), b as number))); }}
+                className="h-9 px-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-medium transition-colors"
+              >
+                {label as string}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Summary cards — gradient style matching AccountList */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <SummaryCard color="from-blue-600 to-cyan-600"        icon={ClipboardList} label="Jobs in window"   value={summary.totalJobs.toLocaleString()} />
-        <SummaryCard color="from-emerald-600 to-green-600"   icon={Package}       label="Modules to pick"  value={summary.totalModules.toLocaleString()} />
-        <SummaryCard color="from-amber-600 to-orange-600"    icon={Battery}       label="Battery jobs"     value={summary.withBattery.toLocaleString()} />
-        <SummaryCard color="from-purple-600 to-pink-600"     icon={Zap}           label="EV charger jobs"  value={summary.withEV.toLocaleString()} />
+      {/* Summary — quiet, monochrome with one sky accent */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Stat label="Jobs in window"  value={summary.totalJobs.toLocaleString()}    icon={ClipboardList} accent />
+        <Stat label="Modules to pick" value={summary.totalModules.toLocaleString()} icon={Package} />
+        <Stat label="Battery jobs"    value={summary.withBattery.toLocaleString()}  icon={Battery} />
+        <Stat label="EV charger jobs" value={summary.withEV.toLocaleString()}       icon={Zap} />
       </div>
 
       {/* List */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 text-sm">
-          <div className="text-gray-600">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+        <div className="flex items-center justify-between px-4 h-10 border-b border-zinc-200 dark:border-zinc-800 text-xs">
+          <div className="text-zinc-600 dark:text-zinc-400">
             {loading ? 'Loading…' : (
               <>
-                <span className="font-semibold text-gray-900">{filtered.length}</span> job{filtered.length === 1 ? '' : 's'}
-                {selected.size > 0 && <span className="ml-2 text-blue-600 font-semibold">· {selected.size} selected</span>}
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">{filtered.length}</span> job{filtered.length === 1 ? '' : 's'}
+                {selected.size > 0 && <span className="ml-2 text-blue-500 font-medium">· {selected.size} selected</span>}
               </>
             )}
           </div>
-          <div className="flex items-center gap-3 text-sm">
-            <button onClick={selectAllVisible} className="text-gray-600 hover:text-blue-600 font-medium">Select all</button>
-            {selected.size > 0 && <button onClick={clearSel} className="text-gray-600 hover:text-blue-600 font-medium">Clear</button>}
+          <div className="flex items-center gap-3">
+            <button onClick={selectAllVisible} className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium">Select all</button>
+            {selected.size > 0 && <button onClick={clearSel} className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium">Clear</button>}
           </div>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center h-32">
-            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-zinc-300 dark:border-zinc-700 border-t-blue-500 rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 px-6">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto" />
-            <div className="font-semibold mt-3 text-gray-900">No jobs scheduled in this window.</div>
-            <div className="text-sm text-gray-500 mt-1">Try widening the date range or clearing the search.</div>
+            <FileText className="w-8 h-8 text-zinc-300 dark:text-zinc-700 mx-auto" />
+            <div className="font-medium text-sm mt-3 text-zinc-900 dark:text-zinc-100">No jobs in this window.</div>
+            <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Try widening the date range or clearing the search.</div>
           </div>
         ) : (
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {filtered.map((o) => {
               const acc = o.AccountId ? accounts.get(o.AccountId) : undefined;
               const sel = selected.has(o.Id);
               return (
-                <li key={o.Id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={sel}
-                    onChange={() => toggleSel(o.Id)}
+                <li key={o.Id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-950/50 transition-colors">
+                  <input type="checkbox" checked={sel} onChange={() => toggleSel(o.Id)}
                     aria-label={`Select job ${o.Job_Number__c ?? ''}`}
-                    className="w-4 h-4 accent-blue-600 shrink-0"
-                  />
-                  <button onClick={() => openJob(o.Id)} className="flex-1 flex items-center gap-4 text-left min-w-0">
-                    <div className="w-20 shrink-0">
-                      <div className="text-[10px] tracking-wider uppercase font-bold text-gray-500">Job</div>
-                      <div className="text-base font-black text-gray-900 tabular-nums">{o.Job_Number__c ?? '—'}</div>
+                    className="w-3.5 h-3.5 accent-blue-500 shrink-0" />
+                  <button onClick={() => openJob(o.Id)} className="flex-1 flex items-center gap-3 text-left min-w-0">
+                    <div className="w-16 shrink-0 tabular text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                      {o.Job_Number__c ?? '—'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-900 truncate">{o.Name ?? '(unnamed)'}</div>
-                      <div className="text-xs text-gray-500 truncate">{acc?.Name ?? '—'} &middot; {o.Install_Address__c ?? '—'}</div>
+                      <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{o.Name ?? '(unnamed)'}</div>
+                      <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{acc?.Name ?? '—'} · {o.Install_Address__c ?? '—'}</div>
                     </div>
-                    <div className="w-32 shrink-0 text-right">
-                      <div className="text-[10px] tracking-wider uppercase font-bold text-gray-500">Install</div>
-                      <div className="text-sm font-bold text-gray-900 tabular-nums">{fmtShortDate(o.Install_Scheduled_Date__c)}</div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400 tabular shrink-0 w-20 text-right">
+                      {fmtShortDate(o.Install_Scheduled_Date__c)}
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                    <ChevronRight className="w-3.5 h-3.5 text-zinc-300 dark:text-zinc-700 shrink-0" />
                   </button>
                 </li>
               );
@@ -394,30 +367,15 @@ export function PullSheets() {
   );
 }
 
-/* ─── pieces ─── */
-
-function SummaryCard(props: { color: string; icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
-  const Icon = props.icon;
+function Stat({ label, value, icon: Icon, accent }: { label: string; value: string; icon: React.ComponentType<{ className?: string }>; accent?: boolean }) {
   return (
-    <div className={`bg-gradient-to-br ${props.color} rounded-2xl shadow-2xl p-6 relative overflow-hidden`}>
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-      <div className="relative z-10">
-        <Icon className="w-10 h-10 text-white/90 mb-3" />
-        <div className="text-4xl font-black text-white mb-2 tabular-nums">{props.value}</div>
-        <div className="text-sm text-white/80 font-medium">{props.label}</div>
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</span>
+        <Icon className={`w-3.5 h-3.5 ${accent ? 'text-blue-500' : 'text-zinc-400 dark:text-zinc-600'}`} />
       </div>
+      <div className="font-display text-2xl font-semibold tabular text-zinc-900 dark:text-zinc-100 mt-2 tracking-tight">{value}</div>
     </div>
-  );
-}
-
-function ChipButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className="px-3 py-2.5 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 text-xs font-semibold transition-colors"
-    >
-      {children}
-    </button>
   );
 }
 
@@ -437,8 +395,6 @@ function PrintCSS() {
   );
 }
 
-/* ─── utils ─── */
-
 function isoDate(d: Date): string {
   const t = new Date(d.getTime() - d.getTimezoneOffset() * 60_000);
   return t.toISOString().slice(0, 10);
@@ -450,7 +406,7 @@ function fmtShortDate(d: string | null | undefined): string {
   if (!d) return '—';
   const parsed = new Date(d + 'T00:00:00');
   if (Number.isNaN(parsed.getTime())) return d;
-  return parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+  return parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 export default PullSheets;
