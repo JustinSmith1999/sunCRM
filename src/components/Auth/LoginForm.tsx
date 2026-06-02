@@ -183,24 +183,23 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Soft brand wash — sky blue dawn with a sun glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-sky/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-[28rem] h-[28rem] bg-sun/10 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-yellow-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-amber-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative bg-white rounded-2xl shadow-pop p-8 sm:p-10 lg:p-12 w-full max-w-md border border-line animate-fade-up">
-        {/* Header — editorial */}
+      <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 sm:p-10 lg:p-12 w-full max-w-md border border-slate-200/50">
+        {/* Header */}
         <div className="text-center mb-8">
           <img
             src="https://husbupeealwuxyopfwwb.supabase.co/storage/v1/object/public/logos/03018223-ac24-400d-acbc-2c1480a05441.webp"
-            alt=""
-            className="w-20 h-20 sm:w-24 sm:h-24 object-contain mx-auto"
+            alt="Logo"
+            className="w-36 h-36 sm:w-44 sm:h-44 object-contain mx-auto drop-shadow-xl"
           />
-          <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark mt-5">SUNation Energy</div>
-          <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Welcome back.</h1>
-          <p className="text-ink-muted mt-2">Sign in to sunCRM.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-6 mb-2">Welcome Back</h1>
+          <p className="text-slate-500">Sign in to access your dashboard</p>
         </div>
 
         {/* Lockout Message */}
@@ -233,9 +232,9 @@ export function LoginForm() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="email" className="block text-[13px] font-semibold text-ink mb-1.5">
-              Email
+          <div className="group">
+            <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+              Email Address
             </label>
             <input
               id="email"
@@ -243,13 +242,13 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full h-12 px-4 border border-line rounded-lg bg-white text-ink placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-sky focus:border-transparent transition-all duration-fast"
-              placeholder="you@sunation.com"
+              className="w-full px-4 py-3.5 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-slate-900 placeholder:text-slate-400 bg-white/50"
+              placeholder="you@company.com"
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-[13px] font-semibold text-ink mb-1.5">
+          <div className="group">
+            <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
               Password
             </label>
             <input
@@ -258,7 +257,7 @@ export function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full h-12 px-4 border border-line rounded-lg bg-white text-ink placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-sky focus:border-transparent transition-all duration-fast"
+              className="w-full px-4 py-3.5 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-slate-900 placeholder:text-slate-400 bg-white/50"
               placeholder="••••••••"
             />
           </div>
@@ -266,21 +265,22 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={loading || isLocked}
-            className="w-full bg-sky hover:bg-sky-deep text-white font-semibold h-14 px-6 rounded-full transition-all duration-fast ease-smooth flex items-center justify-center shadow-soft press-scale disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:from-slate-300 disabled:to-slate-300 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] disabled:hover:scale-100 disabled:shadow-none"
           >
             {loading ? (
-              <div className="w-5 h-5 border-[3px] border-current/30 border-t-current rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : isLocked ? (
               'Account Locked'
             ) : (
-              'Sign in'
+              'Sign In'
             )}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-line">
-          <p className="text-center text-[11px] tracking-wide text-ink-subtle">
-            Secured by Supabase &middot; SUNation Energy &middot; Ronkonkoma, NY
+        {/* Footer decoration */}
+        <div className="mt-8 pt-6 border-t border-slate-200">
+          <p className="text-center text-xs text-slate-400">
+            Secure authentication powered by advanced encryption
           </p>
         </div>
       </div>

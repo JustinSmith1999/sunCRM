@@ -10,34 +10,39 @@ interface MobileHeaderProps {
   onNavigateHome: () => void;
 }
 
-export function MobileHeader({ showSidebar, onToggleSidebar, onNavigateHome }: MobileHeaderProps) {
+export function MobileHeader({ showSidebar, onToggleSidebar, currentView, onNavigateHome }: MobileHeaderProps) {
   return (
-    <div
-      className="md:hidden bg-white/95 backdrop-blur text-ink px-3 flex items-center justify-between border-b border-line fixed top-0 left-0 right-0 z-40"
-      style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)', paddingBottom: '0.625rem' }}
-    >
+    <div className="md:hidden bg-slate-900 text-white px-3 py-2.5 flex items-center justify-between border-b border-slate-700 fixed top-0 left-0 right-0 z-40">
       <button
         onClick={onToggleSidebar}
-        aria-label={showSidebar ? 'Close menu' : 'Open menu'}
-        className="p-2 -ml-1 text-ink hover:bg-sand-pale rounded-lg transition-colors duration-fast ease-smooth press-scale"
+        className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors"
       >
-        {showSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        {showSidebar ? (
+          <X className="w-4 h-4" />
+        ) : (
+          <Menu className="w-4 h-4" />
+        )}
       </button>
 
-      <button onClick={onNavigateHome} className="flex-1 flex items-center justify-center gap-2">
-        <img
-          src="https://husbupeealwuxyopfwwb.supabase.co/storage/v1/object/public/logos/03018223-ac24-400d-acbc-2c1480a05441.webp"
-          alt=""
-          className="w-6 h-6 object-contain"
-        />
-        <span className="font-display text-lg font-bold leading-none">sunCRM</span>
+      <button
+        onClick={onNavigateHome}
+        className="flex-1 text-center"
+      >
+        <h1 className="text-lg font-semibold">sunCRM</h1>
       </button>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <div className="hidden sm:block">
           <GlobalSearch />
         </div>
         <NotificationBell />
+        <div className="w-9 h-9 flex items-center justify-center">
+          <img
+            src="https://husbupeealwuxyopfwwb.supabase.co/storage/v1/object/public/logos/03018223-ac24-400d-acbc-2c1480a05441.webp"
+            alt="Logo"
+            className="w-6 h-6 object-contain"
+          />
+        </div>
       </div>
     </div>
   );

@@ -359,20 +359,20 @@ export function LeadList() {
   return (
     <div className="p-3 sm:p-4 md:p-6">
       <div className="flex flex-col gap-3 mb-4 sm:mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark">Pipeline · People</div>
-            <h1 className="font-display text-[28px] sm:text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Leads</h1>
-            <p className="text-sm text-ink-muted mt-1">
-              {totalCount.toLocaleString()} total &middot; manage and qualify
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Leads</h1>
+            <p className="text-sm sm:text-base text-slate-600">
+              Manage and qualify your sales leads ({totalCount.toLocaleString()} total)
             </p>
           </div>
           <button
             onClick={() => setShowNewLeadModal(true)}
-            className="bg-sky hover:bg-sky-deep text-white px-5 h-10 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-fast ease-smooth shadow-soft press-scale self-start sm:self-end"
+            className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-2 sm:px-4 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors active:scale-95"
           >
             <Plus className="w-4 h-4" />
-            New Lead
+            <span className="hidden sm:inline">New Lead</span>
+            <span className="sm:hidden">New</span>
           </button>
         </div>
         <DateRangeFilter value={dateRange} onChange={(k) => { setDateRange(k); setCurrentPage(1); }} />

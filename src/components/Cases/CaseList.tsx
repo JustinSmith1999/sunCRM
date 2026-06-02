@@ -211,9 +211,8 @@ export function CaseList() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark">Service</div>
-        <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Cases</h1>
-        <p className="text-sm text-ink-muted mt-1">Manage customer support cases and issues.</p>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Cases</h1>
+        <p className="text-slate-600">Manage customer support cases and issues</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

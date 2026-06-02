@@ -343,8 +343,7 @@ const menuItems: MenuItem[] = [
         id: 'pull-sheets',
         label: 'Pull Sheets',
         icon: ClipboardList,
-        // Wide open for the demo — anyone authenticated can see it. Tighten later
-        // once role boundaries for the warehouse staff are finalized.
+        // Wide open during initial rollout — tighten after demo.
         allowedRoles: ['admin', 'operations_manager', 'operations', 'warehouse_manager', 'sales_manager', 'sales_rep', 'support']
       },
       {
@@ -477,7 +476,7 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
         />
       )}
 
-      <div className={`bg-navy text-white transition-all duration-base ease-smooth flex flex-col border-r border-navy-deep
+      <div className={`bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white transition-all duration-300 flex flex-col border-r border-slate-800
         ${collapsed ? 'w-16' : 'w-64'}
         ${showOnMobile
           ? 'fixed top-0 left-0 h-full w-64 z-50 shadow-2xl'
@@ -485,7 +484,7 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
         }
         md:flex md:fixed md:left-0 md:top-0 md:h-screen
       `}>
-      <div className="p-2 border-b border-navy-deep">
+      <div className="p-2 border-b border-slate-700">
         <div className="flex flex-col items-center gap-1">
           <img
             src="https://husbupeealwuxyopfwwb.supabase.co/storage/v1/object/public/logos/03018223-ac24-400d-acbc-2c1480a05441.webp"
@@ -495,21 +494,20 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
             }`}
           />
           {!collapsed && (
-            <div className="text-center mt-1">
-              <div className="text-[10px] uppercase tracking-eyebrow text-ink-300">SUNation Energy</div>
-              <h2 className="font-display text-white font-bold text-base leading-tight mt-0.5">sunCRM</h2>
+            <div className="text-center">
+              <h2 className="text-white font-semibold text-sm">Admin Console</h2>
             </div>
           )}
         </div>
 
         <button
           onClick={onToggleCollapsed}
-          className="hidden md:flex items-center justify-center w-6 h-6 bg-white/[0.04] hover:bg-white/10 rounded mt-2 ml-auto transition-colors duration-fast ease-smooth"
+          className="hidden md:flex items-center justify-center w-6 h-6 bg-slate-800 hover:bg-slate-700 rounded mt-2 ml-auto transition-colors"
         >
           {collapsed ? (
-            <ChevronRight className="w-4 h-4 text-ink-300" />
+            <ChevronRight className="w-4 h-4 text-slate-400" />
           ) : (
-            <ChevronLeft className="w-4 h-4 text-ink-300" />
+            <ChevronLeft className="w-4 h-4 text-slate-400" />
           )}
         </button>
       </div>
@@ -542,8 +540,8 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
                       }}
                       className={`w-full flex items-center ${collapsed ? 'justify-center' : 'justify-between'} px-2 py-1.5 rounded-lg transition-all border-l-2 ${
                         isActive
-                          ? 'bg-white/5 text-white border-sun'
-                          : 'hover:bg-white/[0.04] text-ink-200 border-transparent hover:border-navy-deep'
+                          ? 'bg-slate-800/50 text-white border-amber-500'
+                          : 'hover:bg-slate-800/30 text-slate-300 border-transparent hover:border-slate-700'
                       }`}
                     >
                       <div className={`flex items-center ${collapsed ? '' : 'gap-2'}`}>
@@ -563,7 +561,7 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
                       )}
                     </button>
                     {isExpanded && !collapsed && (
-                      <ul className="ml-4 mt-0.5 space-y-0.5 border-l border-navy-deep pl-2">
+                      <ul className="ml-4 mt-0.5 space-y-0.5 border-l border-slate-700 pl-2">
                         {visibleChildren.map((child) => {
                           const ChildIcon = child.icon;
                           const isChildActive = currentView === child.id;
@@ -577,8 +575,8 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
                                 }}
                                 className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all text-sm border-l-2 ${
                                   isChildActive
-                                    ? 'bg-sky/15 text-white font-semibold border-sun'
-                                    : 'hover:bg-white/[0.04] text-ink-300 hover:text-ink-200 border-transparent'
+                                    ? 'bg-blue-500/20 text-white font-semibold border-blue-500'
+                                    : 'hover:bg-slate-800/30 text-slate-400 hover:text-slate-300 border-transparent'
                                 }`}
                               >
                                 <ChildIcon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -598,8 +596,8 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
                     }}
                     className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-2'} px-2 py-1.5 rounded-lg transition-all active:scale-95 border-l-2 ${
                       isActive
-                        ? 'bg-sky/15 text-white font-semibold border-sun'
-                        : 'hover:bg-white/[0.04] text-ink-200 hover:text-white border-transparent hover:border-navy-deep'
+                        ? 'bg-blue-500/20 text-white font-semibold border-blue-500'
+                        : 'hover:bg-slate-800/30 text-slate-300 hover:text-white border-transparent hover:border-slate-700'
                     }`}
                   >
                     <Icon className="w-4 h-4 flex-shrink-0" />
@@ -619,15 +617,15 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
       <div className="p-2 border-t border-slate-800">
         <div className="mb-2">
           <div className="flex items-center gap-2 mb-2 px-2 py-2">
-            <div className="w-9 h-9 bg-sun rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-ink-700">
-              <User className="w-5 h-5 text-ink" />
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-slate-700">
+              <User className="w-5 h-5 text-white" />
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-semibold truncate text-white">
                   {profile?.full_name || profile?.email}
                 </div>
-                <div className="text-[11px] truncate capitalize px-2 py-0.5 rounded-full inline-block bg-sun-pale/10 text-sun font-medium mt-1">
+                <div className="text-xs truncate capitalize px-2 py-0.5 rounded-full inline-block bg-blue-500/20 text-blue-400 font-medium mt-1">
                   {profile?.role?.replace('_', ' ')}
                 </div>
               </div>
@@ -637,7 +635,7 @@ export function Sidebar({ currentView, onViewChange, collapsed, onToggleCollapse
 
         <button
           onClick={signOut}
-          className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-2'} py-2 px-2 text-ink-300 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-fast ease-smooth press-scale`}
+          className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-2'} py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-all active:scale-95`}
           title={collapsed ? 'Sign Out' : ''}
         >
           <LogOut className="w-4 h-4" />

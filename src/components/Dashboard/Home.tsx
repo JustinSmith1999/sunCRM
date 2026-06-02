@@ -212,7 +212,7 @@ export function Home({ onViewChange }: HomeProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-sky border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-t-transparent rounded-full animate-spin" style={{ borderColor: BRAND.sky, borderTopColor: 'transparent', borderWidth: 3 }} />
       </div>
     );
   }
@@ -221,105 +221,98 @@ export function Home({ onViewChange }: HomeProps) {
   const thisMonthRevenue = monthlyRevenue.length >= 1 ? monthlyRevenue[monthlyRevenue.length - 1]?.revenue : 0;
   const revTrend = prevMonthRevenue > 0 ? ((thisMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100 : 0;
 
-  const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return 'Good morning';
-    if (h < 18) return 'Good afternoon';
-    return 'Good evening';
-  })();
-  const firstName = (profile?.full_name || '').split(' ')[0] || '';
-
   return (
-    <div className="space-y-6 animate-fade-up">
-      {/* Page header — editorial hero with serif greeting */}
-      <div className="flex items-end justify-between flex-wrap gap-3">
+    <div className="space-y-5">
+      {/* Page header */}
+      <div className="flex items-center justify-between">
         <div>
-          <div className="text-[11px] font-bold tracking-eyebrow text-sky-dark uppercase">SUNation Energy &middot; Executive</div>
-          <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">
-            {greeting}{firstName ? `, ${firstName}` : ''}.
-          </h1>
-          <p className="text-sm text-ink-muted mt-1">
+          <h1 className="text-xl font-bold text-gray-900">Executive Dashboard</h1>
+          <p className="text-xs text-gray-400 mt-0.5">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <button
           onClick={() => onViewChange?.('reports')}
-          className="flex items-center gap-2 text-sm font-semibold px-4 h-10 rounded-full border border-line-strong text-ink hover:bg-sand-pale transition-colors duration-fast ease-smooth press-scale"
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
         >
-          <BarChart2 className="w-4 h-4" /> View Reports
+          <BarChart2 className="w-3.5 h-3.5" /> View Reports
         </button>
       </div>
 
       {/* ── KPI Row ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Pipeline */}
-        <button onClick={() => onViewChange?.('deals')} className="text-left bg-white rounded-lg border border-line p-4 hover:shadow-card hover:-translate-y-0.5 transition-all duration-base ease-smooth press-scale">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Active Pipeline</span>
-            <DollarSign className="w-4 h-4 text-ink-300" />
+        <div className="bg-white rounded-xl border border-gray-100 p-4 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('deals')}>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Active Pipeline</span>
+            <DollarSign className="w-4 h-4 text-gray-300" />
           </div>
-          <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{fmt$(kpis.pipeline)}</div>
-          <div className="text-xs text-ink-muted mt-1">{kpis.pipelineCount.toLocaleString()} opportunities</div>
-          <div className="mt-3 h-1 bg-ink-50 rounded-full overflow-hidden">
-            <div className="h-1 bg-sky rounded-full" style={{ width: '65%' }} />
+          <div className="text-2xl font-bold text-gray-900">{fmt$(kpis.pipeline)}</div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-gray-400">{kpis.pipelineCount.toLocaleString()} opportunities</span>
           </div>
-        </button>
+          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+            <div className="h-1 rounded-full" style={{ width: '65%', backgroundColor: BRAND.sky }} />
+          </div>
+        </div>
 
         {/* Won MTD */}
-        <button onClick={() => onViewChange?.('deals')} className="text-left bg-white rounded-lg border border-line p-4 hover:shadow-card hover:-translate-y-0.5 transition-all duration-base ease-smooth press-scale">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Won This Month</span>
-            <CheckCircle className="w-4 h-4 text-ink-300" />
+        <div className="bg-white rounded-xl border border-gray-100 p-4 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('deals')}>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Won This Month</span>
+            <CheckCircle className="w-4 h-4 text-gray-300" />
           </div>
-          <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{fmt$(kpis.wonMonth)}</div>
-          <div className="text-xs text-ink-muted mt-1 flex items-center gap-2 flex-wrap">
-            <span>{kpis.wonMonthCount} deals closed</span>
+          <div className="text-2xl font-bold text-gray-900">{fmt$(kpis.wonMonth)}</div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-gray-400">{kpis.wonMonthCount} deals closed</span>
             {kpis.wonMTDvsPrev !== 0 && (
-              <span className={`inline-flex items-center gap-0.5 font-medium ${kpis.wonMTDvsPrev >= 0 ? 'text-court' : 'text-danger'}`}>
+              <span className={`flex items-center gap-0.5 text-xs font-medium ${kpis.wonMTDvsPrev >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {kpis.wonMTDvsPrev >= 0 ? <ArrowUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                 {Math.abs(kpis.wonMTDvsPrev).toFixed(0)}% vs last mo
               </span>
             )}
           </div>
-          <div className="mt-3 h-1 bg-ink-50 rounded-full overflow-hidden">
-            <div className="h-1 bg-court rounded-full" style={{ width: `${Math.min((kpis.wonMonthCount / 50) * 100, 100)}%` }} />
+          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+            <div className="h-1 rounded-full" style={{ width: `${Math.min((kpis.wonMonthCount / 50) * 100, 100)}%`, backgroundColor: BRAND.gold }} />
           </div>
-        </button>
+        </div>
 
         {/* Open Cases */}
-        <button
+        <div
+          className={`bg-white rounded-xl border p-4 cursor-pointer transition-colors ${kpis.openCasesUrgent > 0 ? 'border-red-200 hover:border-red-300' : 'border-gray-100 hover:border-sky-200'}`}
           onClick={() => onViewChange?.('cases')}
-          className={`text-left bg-white rounded-lg border p-4 hover:shadow-card hover:-translate-y-0.5 transition-all duration-base ease-smooth press-scale ${kpis.openCasesUrgent > 0 ? 'border-danger/30' : 'border-line'}`}
         >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Open Cases</span>
-            <AlertCircle className={`w-4 h-4 ${kpis.openCasesUrgent > 0 ? 'text-danger' : 'text-ink-300'}`} />
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Open Cases</span>
+            <AlertCircle className={`w-4 h-4 ${kpis.openCasesUrgent > 0 ? 'text-red-400' : 'text-gray-300'}`} />
           </div>
-          <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{kpis.openCases.toLocaleString()}</div>
-          <div className="text-xs mt-1">
+          <div className="text-2xl font-bold text-gray-900">{kpis.openCases.toLocaleString()}</div>
+          <div className="flex items-center gap-2 mt-1">
             {kpis.openCasesUrgent > 0 ? (
-              <span className="font-medium text-danger">{kpis.openCasesUrgent} high priority</span>
+              <span className="text-xs font-medium text-red-500">{kpis.openCasesUrgent} high priority</span>
             ) : (
-              <span className="text-ink-muted">No high-priority cases</span>
+              <span className="text-xs text-gray-400">No high-priority cases</span>
             )}
           </div>
-          <div className="mt-3 h-1 bg-ink-50 rounded-full overflow-hidden">
-            <div className="h-1 bg-danger rounded-full" style={{ width: `${Math.min((kpis.openCasesUrgent / Math.max(kpis.openCases, 1)) * 100, 100)}%` }} />
+          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+            <div className="h-1 rounded-full bg-red-400" style={{ width: `${Math.min((kpis.openCasesUrgent / Math.max(kpis.openCases, 1)) * 100, 100)}%` }} />
           </div>
-        </button>
+        </div>
 
         {/* Accounts */}
-        <button onClick={() => onViewChange?.('accounts')} className="text-left bg-white rounded-lg border border-line p-4 hover:shadow-card hover:-translate-y-0.5 transition-all duration-base ease-smooth press-scale">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Accounts</span>
-            <Building2 className="w-4 h-4 text-ink-300" />
+        <div className="bg-white rounded-xl border border-gray-100 p-4 cursor-pointer hover:border-sky-200 transition-colors" onClick={() => onViewChange?.('accounts')}>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Accounts</span>
+            <Building2 className="w-4 h-4 text-gray-300" />
           </div>
-          <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{kpis.accounts.toLocaleString()}</div>
-          <div className="text-xs text-ink-muted mt-1">{kpis.avgDeal > 0 ? `Avg deal ${fmt$(kpis.avgDeal)}` : 'Total customer base'}</div>
-          <div className="mt-3 h-1 bg-ink-50 rounded-full overflow-hidden">
-            <div className="h-1 bg-ink rounded-full" style={{ width: '80%' }} />
+          <div className="text-2xl font-bold text-gray-900">{kpis.accounts.toLocaleString()}</div>
+          <div className="flex items-center gap-4 mt-1">
+            <span className="text-xs text-gray-400">{kpis.avgDeal > 0 ? `Avg deal ${fmt$(kpis.avgDeal)}` : 'Total customer base'}</span>
           </div>
-        </button>
+          <div className="mt-3 h-1 bg-gray-100 rounded-full">
+            <div className="h-1 rounded-full" style={{ width: '80%', backgroundColor: BRAND.navy }} />
+          </div>
+        </div>
       </div>
 
       {/* ── Secondary Metrics Row ── */}

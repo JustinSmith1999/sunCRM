@@ -266,9 +266,8 @@ export function AdminDashboard({ onViewChange }: AdminDashboardProps) {
     <div className="p-6">
       {/* Header */}
       <div className="mb-8">
-        <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark">System</div>
-        <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Administration</h1>
-        <p className="text-sm text-ink-muted mt-1">System configuration and management.</p>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Administration</h1>
+        <p className="text-slate-600">System configuration and management</p>
       </div>
 
       {/* Navigation Tiles */}
@@ -279,7 +278,7 @@ export function AdminDashboard({ onViewChange }: AdminDashboardProps) {
             <button
               key={tile.id}
               onClick={tile.onClick}
-              className="group p-4 bg-white rounded-lg border border-line hover:shadow-card hover:-translate-y-0.5 hover:border-sky/40 transition-all duration-base ease-smooth text-center press-scale"
+              className="group p-4 bg-white rounded-lg border border-slate-200 hover:shadow-lg hover:border-slate-300 transition-all duration-200 text-center"
             >
               <div className={`w-14 h-14 ${tile.color} rounded-lg flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform`}>
                 <IconComponent className="w-7 h-7 text-white" />

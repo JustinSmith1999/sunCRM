@@ -408,15 +408,14 @@ export function DealsKanban() {
     <div className="space-y-4 sm:space-y-6">
 
         <div>
-          <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark">Pipeline</div>
-          <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Sales Pipeline</h1>
-          <p className="text-sm text-ink-muted mt-1">Manage opportunities and move deals through the cycle.</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Sales Pipeline</h1>
+          <p className="text-gray-600 mt-1">Manage your opportunities and track deals through the sales cycle</p>
         </div>
 
-        <div className="bg-white rounded-lg border border-line shadow-soft p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-4">
           <div className="flex items-center justify-between mb-4">
-            <div className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Pipeline Summary</div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular">{formatCurrency(totalPipelineValue)}</div>
+            <div className="text-sm font-semibold text-gray-600">Pipeline Summary</div>
+            <div className="text-2xl font-black text-orange-600">{formatCurrency(totalPipelineValue)}</div>
           </div>
           <div className="h-3 bg-gray-100 rounded-full overflow-hidden flex">
             {PIPELINE_COLUMNS.map((col) => {

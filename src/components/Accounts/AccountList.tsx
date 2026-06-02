@@ -295,48 +295,52 @@ export function AccountList() {
         <div>
           <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
             <div>
-              <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark">Customer Base</div>
-              <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Accounts</h1>
-              <p className="text-sm text-ink-muted mt-1">Manage and track your customer accounts.</p>
+              <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Account Management</h1>
+              <p className="text-gray-500 mt-1 text-sm">Manage and track your customer accounts</p>
             </div>
           </div>
           <DateRangeFilter value={dateRange} onChange={(k) => { setDateRange(k); setCurrentPage(1); }} />
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Total Accounts</span>
-              <Building2 className="w-4 h-4 text-sky" />
-            </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{stats.total.toLocaleString()}</div>
-          </div>
-
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Active This Month</span>
-              <Activity className="w-4 h-4 text-court" />
-            </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{stats.activeThisMonth.toLocaleString()}</div>
-            <div className="text-xs text-court font-medium mt-1 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" /> {stats.total > 0 ? Math.round((stats.activeThisMonth / stats.total) * 100) : 0}% active
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <Building2 className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-5xl font-black text-white mb-2">{stats.total}</div>
+              <div className="text-sm text-blue-100 font-medium">Total Accounts</div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Annual Revenue</span>
-              <DollarSign className="w-4 h-4 text-sun-deep" />
+          <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <Activity className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-5xl font-black text-white mb-2">{stats.activeThisMonth}</div>
+              <div className="text-sm text-emerald-100 font-medium">Active This Month</div>
+              <div className="mt-2 text-xs text-emerald-200 bg-emerald-500/20 px-2 py-1 rounded-full inline-block">
+                <TrendingUp className="w-3 h-3 inline mr-1" />
+                +{Math.round((stats.activeThisMonth / stats.total) * 100)}%
+              </div>
             </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{formatCurrency(stats.totalRevenue.toString())}</div>
           </div>
 
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">New This Quarter</span>
-              <Sparkles className="w-4 h-4 text-sky" />
+          <div className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <DollarSign className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-4xl font-black text-white mb-2">{formatCurrency(stats.totalRevenue.toString())}</div>
+              <div className="text-sm text-amber-100 font-medium">Total Annual Revenue</div>
             </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{stats.newThisQuarter.toLocaleString()}</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <Sparkles className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-5xl font-black text-white mb-2">{stats.newThisQuarter}</div>
+              <div className="text-sm text-purple-100 font-medium">New This Quarter</div>
+            </div>
           </div>
         </div>
 

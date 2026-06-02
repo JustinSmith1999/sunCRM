@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Calendar, Printer, Search, FileText, ChevronLeft, RefreshCw, ChevronRight, Hash, ArrowRight } from 'lucide-react';
+import {
+  Calendar, Printer, Search, FileText, ChevronLeft, ChevronRight,
+  RefreshCw, Hash, ArrowRight, ClipboardList, Package, Zap, Battery
+} from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { SELECT_CLAUSE, BOM_CATEGORIES, hasValue } from './bomFields';
+import { SELECT_CLAUSE, hasValue } from './bomFields';
 import { PullSheetPrintable } from './PullSheetPrintable';
 
 interface Opp {
@@ -24,16 +27,14 @@ interface Account {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
- *  PullSheets — list + filter + detail.
- *  Replaces the .xlsm warehouse pull sheet workflow:
- *   - default view: jobs scheduled in the next 7 days
- *   - pick any job → printable per-job pull list
+ *  PullSheets — list + filter + printable detail.
+ *  Replaces the .xlsm warehouse pull sheet workflow.
+ *   - Type a Job # → jump straight to that printable sheet (the operator flow)
+ *   - OR pick from a list filtered by install date (the planner flow)
  *   - "Print all" produces a multi-page sheet, page-break per job
+ *  Styled to match the original Bolt sunCRM admin theme.
  * ────────────────────────────────────────────────────────────────────────── */
 export function PullSheets() {
-  // Default range: last 90 days through next 30 days. Covers historical
-  // jobs (so the page never looks empty if Salesforce sync is stale) AND
-  // upcoming jobs once fresh data flows in.
   const [from, setFrom] = useState<string>(() => isoDate(addDays(new Date(), -90)));
   const [to,   setTo]   = useState<string>(() => isoDate(addDays(new Date(),  30)));
   const [search, setSearch] = useState('');
@@ -42,53 +43,15 @@ export function PullSheets() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openId, setOpenId] = useState<string | null>(null);
-  const [openOpp, setOpenOpp] = useState<Opp | null>(null);          // for lookups outside the date window
+  const [openOpp, setOpenOpp] = useState<Opp | null>(null);
   const [openAcc, setOpenAcc] = useState<Account | null>(null);
   const [mode, setMode] = useState<'list' | 'detail' | 'printAll'>('list');
 
-  // Job # lookup — the warehouse's primary workflow. Auto-focused on load,
-  // takes a server-side direct hit on opportunities and jumps straight to
-  // the printable sheet. Bypasses the date window so any job is reachable.
   const [lookupValue, setLookupValue] = useState('');
   const [lookupBusy, setLookupBusy] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
   const lookupRef = useRef<HTMLInputElement>(null);
   useEffect(() => { if (mode === 'list') lookupRef.current?.focus(); }, [mode]);
-
-  const lookupJob = async (raw: string) => {
-    const job = raw.trim();
-    if (!job) return;
-    setLookupBusy(true);
-    setLookupError(null);
-    const { data, error } = await supabase
-      .from('opportunities')
-      .select(SELECT_CLAUSE)
-      .eq('Job_Number__c', job)
-      .order('LastModifiedDate', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    setLookupBusy(false);
-    if (error) {
-      setLookupError(error.message);
-      return;
-    }
-    if (!data) {
-      setLookupError(`No job found matching #${job}.`);
-      return;
-    }
-    const opp = data as unknown as Opp;
-    // Fetch the account in one round-trip too, so the sheet renders complete.
-    let acc: Account | null = null;
-    if (opp.AccountId) {
-      const { data: a } = await supabase.from('accounts').select('Id, Name, Phone').eq('Id', opp.AccountId).maybeSingle();
-      acc = (a as Account) ?? null;
-    }
-    setOpenOpp(opp);
-    setOpenAcc(acc);
-    setOpenId(opp.Id);
-    setMode('detail');
-    setLookupValue('');
-  };
 
   const load = async () => {
     setLoading(true);
@@ -108,7 +71,6 @@ export function PullSheets() {
     const rows = (data ?? []) as Opp[];
     setOpps(rows);
 
-    // Pull just the accounts we need, in one batched IN-query.
     const accountIds = Array.from(new Set(rows.map((r) => r.AccountId).filter(Boolean) as string[]));
     if (accountIds.length) {
       const { data: accs } = await supabase
@@ -126,7 +88,32 @@ export function PullSheets() {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [from, to]);
 
-  // Cheap client-side search across job#, name, address.
+  const lookupJob = async (raw: string) => {
+    const job = raw.trim();
+    if (!job) return;
+    setLookupBusy(true);
+    setLookupError(null);
+    const { data, error } = await supabase
+      .from('opportunities')
+      .select(SELECT_CLAUSE)
+      .eq('Job_Number__c', job)
+      .order('LastModifiedDate', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    setLookupBusy(false);
+    if (error) { setLookupError(error.message); return; }
+    if (!data) { setLookupError(`No job found matching #${job}.`); return; }
+    const opp = data as unknown as Opp;
+    let acc: Account | null = null;
+    if (opp.AccountId) {
+      const { data: a } = await supabase.from('accounts').select('Id, Name, Phone').eq('Id', opp.AccountId).maybeSingle();
+      acc = (a as Account) ?? null;
+    }
+    setOpenOpp(opp); setOpenAcc(acc); setOpenId(opp.Id);
+    setMode('detail');
+    setLookupValue('');
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return opps;
@@ -137,7 +124,6 @@ export function PullSheets() {
     );
   }, [opps, search]);
 
-  // Counts for the summary bar.
   const summary = useMemo(() => {
     const totalJobs = filtered.length;
     const totalModules = filtered.reduce((sum, o) => {
@@ -145,50 +131,40 @@ export function PullSheets() {
       const b = parseFloat(String(o.Module_Amount_Sold_B__c ?? '0')) || 0;
       return sum + m + b;
     }, 0);
-    const withBattery = filtered.filter((o) => hasValue('text', o.Battery_Storage__c) || hasValue('qty', o.Total_Qty_Battery_Storage__c)).length;
+    const withBattery = filtered.filter((o) => hasValue('text', o.Battery_Storage__c) || hasValue('qty', o.Qty_Battery_Storage__c)).length;
     const withEV      = filtered.filter((o) => hasValue('text', o.EV_Charger_Model__c) || hasValue('qty', o.Qty_EV_Chargers__c)).length;
     return { totalJobs, totalModules, withBattery, withEV };
   }, [filtered]);
 
   const openJob = (id: string) => { setOpenId(id); setMode('detail'); };
-
   const toggleSel = (id: string) => {
-    setSelected((s) => {
-      const next = new Set(s);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+    setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   };
   const selectAllVisible = () => setSelected(new Set(filtered.map((o) => o.Id)));
   const clearSel = () => setSelected(new Set());
-
   const printAllSelected = () => {
     if (selected.size === 0) selectAllVisible();
     setMode('printAll');
-    // Defer the print() until the layout is in the DOM.
     setTimeout(() => window.print(), 80);
   };
 
-  /* ────────── Render ────────── */
-
+  /* ─── detail ─── */
   if (mode === 'detail' && openId) {
-    // Prefer the explicitly looked-up record (works for jobs outside the
-    // current date window). Fall back to the in-window list otherwise.
     const opp = openOpp ?? opps.find((o) => o.Id === openId) ?? null;
     if (!opp) return null;
     const acc = openAcc ?? (opp.AccountId ? accounts.get(opp.AccountId) ?? null : null);
     return (
-      <div className="max-w-4xl mx-auto animate-fade-up">
-        <div className="flex items-center justify-between mb-4 no-print">
+      <div className="p-6 max-w-5xl mx-auto">
+        <div className="flex items-center justify-between mb-6 no-print">
           <button
             onClick={() => { setMode('list'); setOpenOpp(null); setOpenAcc(null); setOpenId(null); }}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-sky transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" /> Back to list
           </button>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-4 h-10 rounded-full bg-sky hover:bg-sky-deep text-white text-sm font-semibold shadow-soft press-scale transition-all duration-fast ease-smooth"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold shadow-lg transition-all"
           >
             <Printer className="w-4 h-4" /> Print this sheet
           </button>
@@ -196,82 +172,77 @@ export function PullSheets() {
         <div className="print-area">
           <PullSheetPrintable opp={opp} account={acc} />
         </div>
+        <PrintCSS />
       </div>
     );
   }
 
+  /* ─── print all ─── */
   if (mode === 'printAll') {
     const rows = selected.size ? filtered.filter((o) => selected.has(o.Id)) : filtered;
     return (
-      <div>
+      <div className="p-6">
         <div className="flex items-center justify-between mb-4 no-print">
-          <button onClick={() => setMode('list')} className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-sky transition-colors">
+          <button onClick={() => setMode('list')} className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600">
             <ChevronLeft className="w-4 h-4" /> Back to list
           </button>
-          <div className="text-sm text-ink-muted">Print preview: {rows.length} sheet{rows.length === 1 ? '' : 's'}</div>
+          <div className="text-sm text-gray-500">Print preview: {rows.length} sheet{rows.length === 1 ? '' : 's'}</div>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-4 h-10 rounded-full bg-sky hover:bg-sky-deep text-white text-sm font-semibold shadow-soft press-scale transition-all duration-fast ease-smooth"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold shadow-lg transition-all"
           >
             <Printer className="w-4 h-4" /> Print {rows.length}
           </button>
         </div>
         <div className="print-area space-y-6">
           {rows.map((o) => (
-            <PullSheetPrintable
-              key={o.Id}
-              opp={o}
-              account={o.AccountId ? accounts.get(o.AccountId) ?? null : null}
-              pageBreak
-            />
+            <PullSheetPrintable key={o.Id} opp={o} account={o.AccountId ? accounts.get(o.AccountId) ?? null : null} pageBreak />
           ))}
         </div>
+        <PrintCSS />
       </div>
     );
   }
 
-  // ----- LIST MODE -----
+  /* ─── list ─── */
   return (
-    <div className="space-y-5 animate-fade-up">
+    <div className="p-6 space-y-6">
+
       {/* Page header */}
-      <div className="flex items-end justify-between flex-wrap gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark">Operations</div>
-          <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Pull Sheets</h1>
-          <p className="text-sm text-ink-muted mt-1">Warehouse pick lists for jobs scheduled to install. Live from Supabase.</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-900">Pull Sheets</h1>
+          <p className="text-gray-500 mt-1 text-sm">Warehouse pick lists for jobs scheduled to install. Live from Supabase.</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={load}
             disabled={loading}
-            title="Re-fetch from Supabase"
-            className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-line text-ink bg-white hover:bg-ink-50 text-sm font-semibold transition-colors duration-fast ease-smooth press-scale disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 text-sm font-semibold transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
           <button
             onClick={printAllSelected}
             disabled={filtered.length === 0}
-            className="inline-flex items-center gap-2 h-10 px-4 rounded-full bg-sky hover:bg-sky-deep text-white text-sm font-semibold shadow-soft press-scale transition-all duration-fast ease-smooth disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold shadow-lg transition-all disabled:opacity-50"
           >
-            <Printer className="w-4 h-4" />
-            Print {selected.size > 0 ? selected.size : `all ${filtered.length}`}
+            <Printer className="w-4 h-4" /> Print {selected.size > 0 ? selected.size : `all ${filtered.length}`}
           </button>
         </div>
       </div>
 
-      {/* Job # quick lookup — matches the Excel muscle memory: type job#, get sheet. */}
+      {/* Job # quick lookup — primary entry point, matches Excel muscle memory */}
       <form
         onSubmit={(e) => { e.preventDefault(); lookupJob(lookupValue); }}
-        className="bg-navy text-white rounded-lg p-5 shadow-card flex flex-wrap items-end gap-3"
+        className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200"
       >
-        <div className="flex-1 min-w-[280px]">
-          <label className="block text-[11px] font-bold tracking-eyebrow uppercase text-sky-pale/80 mb-1.5">
-            Type a Job # → Get the Pull Sheet
-          </label>
-          <div className="relative">
-            <Hash className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-sky-soft pointer-events-none" />
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Type a Job # to open its Pull Sheet
+        </label>
+        <div className="flex flex-wrap gap-3">
+          <div className="relative flex-1 min-w-[260px]">
+            <Hash className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               ref={lookupRef}
               type="text"
@@ -281,139 +252,135 @@ export function PullSheets() {
               value={lookupValue}
               onChange={(e) => { setLookupValue(e.target.value); setLookupError(null); }}
               placeholder="e.g. 25734"
-              className="w-full h-12 pl-11 pr-3 bg-white text-ink rounded-lg text-base font-semibold placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sun tabular"
+              className="w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base font-semibold"
             />
           </div>
-          {lookupError && <div className="text-[12px] text-sun-soft mt-1.5 font-medium">{lookupError}</div>}
+          <button
+            type="submit"
+            disabled={lookupBusy || !lookupValue.trim()}
+            className="inline-flex items-center gap-2 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-lg disabled:opacity-50 transition-all"
+          >
+            {lookupBusy
+              ? <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              : <ArrowRight className="w-4 h-4" />}
+            Open Sheet
+          </button>
         </div>
-        <button
-          type="submit"
-          disabled={lookupBusy || !lookupValue.trim()}
-          className="h-12 px-6 rounded-full bg-sun hover:bg-sun-deep text-ink font-semibold text-sm shadow-soft press-scale transition-all duration-fast ease-smooth disabled:opacity-50 inline-flex items-center gap-2"
-        >
-          {lookupBusy ? (
-            <span className="inline-block w-4 h-4 border-2 border-ink border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <ArrowRight className="w-4 h-4" />
-          )}
-          Open Sheet
-        </button>
+        {lookupError && <div className="text-sm text-red-600 mt-2 font-medium">{lookupError}</div>}
       </form>
 
       {/* Filter bar */}
-      <div className="bg-white border border-line rounded-lg p-4 shadow-soft">
-        <div className="flex flex-wrap items-end gap-3">
+      <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+        <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle mb-1.5">Install date — from</label>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1.5">Install date — from</label>
             <div className="relative">
-              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 pointer-events-none" />
+              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input
                 type="date"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
-                className="h-10 pl-9 pr-3 border border-line rounded-lg bg-white text-ink text-sm focus:outline-none focus:ring-2 focus:ring-sky"
+                className="pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
           <div>
-            <label className="block text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle mb-1.5">To</label>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1.5">To</label>
             <div className="relative">
-              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 pointer-events-none" />
+              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input
                 type="date"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
-                className="h-10 pl-9 pr-3 border border-line rounded-lg bg-white text-ink text-sm focus:outline-none focus:ring-2 focus:ring-sky"
+                className="pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
           <div className="flex-1 min-w-[240px]">
-            <label className="block text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle mb-1.5">Search</label>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1.5">Search</label>
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 pointer-events-none" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Job #, opportunity name, or address"
-                className="w-full h-10 pl-9 pr-3 border border-line rounded-lg bg-white text-ink text-sm placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sky"
+                className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <button onClick={() => { setFrom(isoDate(addDays(new Date(), -30))); setTo(isoDate(new Date())); }}
-              className="h-10 px-3 rounded-full border border-line text-ink-muted bg-white hover:text-ink hover:bg-ink-50 text-xs font-semibold transition-colors duration-fast">Last 30</button>
-            <button onClick={() => { setFrom(isoDate(addDays(new Date(), -90))); setTo(isoDate(new Date())); }}
-              className="h-10 px-3 rounded-full border border-line text-ink-muted bg-white hover:text-ink hover:bg-ink-50 text-xs font-semibold transition-colors duration-fast">Last 90</button>
-            <button onClick={() => { setFrom(isoDate(new Date())); setTo(isoDate(addDays(new Date(), 7))); }}
-              className="h-10 px-3 rounded-full border border-line text-ink-muted bg-white hover:text-ink hover:bg-ink-50 text-xs font-semibold transition-colors duration-fast">Next 7</button>
-            <button onClick={() => { setFrom(isoDate(new Date())); setTo(isoDate(addDays(new Date(), 30))); }}
-              className="h-10 px-3 rounded-full border border-line text-ink-muted bg-white hover:text-ink hover:bg-ink-50 text-xs font-semibold transition-colors duration-fast">Next 30</button>
-            <button onClick={() => { setFrom(isoDate(addDays(new Date(), -90))); setTo(isoDate(addDays(new Date(), 30))); }}
-              className="h-10 px-3 rounded-full border border-sky text-sky-dark bg-sky-pale hover:bg-sky-soft text-xs font-semibold transition-colors duration-fast">Default window</button>
+            <ChipButton onClick={() => { setFrom(isoDate(addDays(new Date(), -30))); setTo(isoDate(new Date())); }}>Last 30</ChipButton>
+            <ChipButton onClick={() => { setFrom(isoDate(addDays(new Date(), -90))); setTo(isoDate(new Date())); }}>Last 90</ChipButton>
+            <ChipButton onClick={() => { setFrom(isoDate(new Date())); setTo(isoDate(addDays(new Date(), 7))); }}>Next 7</ChipButton>
+            <ChipButton onClick={() => { setFrom(isoDate(new Date())); setTo(isoDate(addDays(new Date(), 30))); }}>Next 30</ChipButton>
           </div>
         </div>
       </div>
 
-      {/* Summary bar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <SummaryCard label="Jobs in window"   value={summary.totalJobs.toLocaleString()} />
-        <SummaryCard label="Modules to pick"  value={summary.totalModules.toLocaleString()} tone="sky" />
-        <SummaryCard label="Battery jobs"     value={summary.withBattery.toLocaleString()} tone="sun" />
-        <SummaryCard label="EV charger jobs"  value={summary.withEV.toLocaleString()} tone="sun" />
+      {/* Summary cards — gradient style matching AccountList */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <SummaryCard color="from-blue-600 to-cyan-600"        icon={ClipboardList} label="Jobs in window"   value={summary.totalJobs.toLocaleString()} />
+        <SummaryCard color="from-emerald-600 to-green-600"   icon={Package}       label="Modules to pick"  value={summary.totalModules.toLocaleString()} />
+        <SummaryCard color="from-amber-600 to-orange-600"    icon={Battery}       label="Battery jobs"     value={summary.withBattery.toLocaleString()} />
+        <SummaryCard color="from-purple-600 to-pink-600"     icon={Zap}           label="EV charger jobs"  value={summary.withEV.toLocaleString()} />
       </div>
 
       {/* List */}
-      <div className="bg-white border border-line rounded-lg shadow-soft overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2 border-b border-line text-xs">
-          <div className="text-ink-muted">
-            {loading ? 'Loading…' : `${filtered.length} job${filtered.length === 1 ? '' : 's'}`}
-            {selected.size > 0 && <span className="ml-2 text-sky-dark font-semibold">· {selected.size} selected</span>}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 text-sm">
+          <div className="text-gray-600">
+            {loading ? 'Loading…' : (
+              <>
+                <span className="font-semibold text-gray-900">{filtered.length}</span> job{filtered.length === 1 ? '' : 's'}
+                {selected.size > 0 && <span className="ml-2 text-blue-600 font-semibold">· {selected.size} selected</span>}
+              </>
+            )}
           </div>
-          <div className="flex items-center gap-3">
-            <button onClick={selectAllVisible} className="text-ink-muted hover:text-ink font-medium">Select all</button>
-            {selected.size > 0 && <button onClick={clearSel} className="text-ink-muted hover:text-ink font-medium">Clear</button>}
+          <div className="flex items-center gap-3 text-sm">
+            <button onClick={selectAllVisible} className="text-gray-600 hover:text-blue-600 font-medium">Select all</button>
+            {selected.size > 0 && <button onClick={clearSel} className="text-gray-600 hover:text-blue-600 font-medium">Clear</button>}
           </div>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center h-32">
-            <div className="w-6 h-6 border-[3px] border-sky border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 px-6">
-            <FileText className="w-10 h-10 text-ink-300 mx-auto" />
-            <div className="font-semibold mt-3 text-ink">No jobs scheduled in this window.</div>
-            <div className="text-sm text-ink-muted mt-1">Try widening the date range or clearing the search.</div>
+          <div className="text-center py-16 px-6">
+            <FileText className="w-12 h-12 text-gray-300 mx-auto" />
+            <div className="font-semibold mt-3 text-gray-900">No jobs scheduled in this window.</div>
+            <div className="text-sm text-gray-500 mt-1">Try widening the date range or clearing the search.</div>
           </div>
         ) : (
-          <ul className="divide-y divide-line">
+          <ul className="divide-y divide-gray-200">
             {filtered.map((o) => {
               const acc = o.AccountId ? accounts.get(o.AccountId) : undefined;
               const sel = selected.has(o.Id);
               return (
-                <li key={o.Id} className="flex items-center gap-3 px-4 py-3 hover:bg-ink-50 transition-colors">
+                <li key={o.Id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
                     checked={sel}
                     onChange={() => toggleSel(o.Id)}
                     aria-label={`Select job ${o.Job_Number__c ?? ''}`}
-                    className="w-4 h-4 accent-sky shrink-0"
+                    className="w-4 h-4 accent-blue-600 shrink-0"
                   />
-                  <button onClick={() => openJob(o.Id)} className="flex-1 flex items-center gap-3 text-left min-w-0">
+                  <button onClick={() => openJob(o.Id)} className="flex-1 flex items-center gap-4 text-left min-w-0">
                     <div className="w-20 shrink-0">
-                      <div className="text-[10px] tracking-eyebrow uppercase font-bold text-ink-subtle">Job</div>
-                      <div className="font-display text-base font-bold text-ink tabular">{o.Job_Number__c ?? '—'}</div>
+                      <div className="text-[10px] tracking-wider uppercase font-bold text-gray-500">Job</div>
+                      <div className="text-base font-black text-gray-900 tabular-nums">{o.Job_Number__c ?? '—'}</div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-ink truncate">{o.Name ?? '(unnamed)'}</div>
-                      <div className="text-xs text-ink-muted truncate">{acc?.Name ?? '—'} &middot; {o.Install_Address__c ?? '—'}</div>
+                      <div className="font-semibold text-gray-900 truncate">{o.Name ?? '(unnamed)'}</div>
+                      <div className="text-xs text-gray-500 truncate">{acc?.Name ?? '—'} &middot; {o.Install_Address__c ?? '—'}</div>
                     </div>
                     <div className="w-32 shrink-0 text-right">
-                      <div className="text-[10px] tracking-eyebrow uppercase font-bold text-ink-subtle">Install</div>
-                      <div className="text-sm font-semibold text-ink tabular">{fmtShortDate(o.Install_Scheduled_Date__c)}</div>
+                      <div className="text-[10px] tracking-wider uppercase font-bold text-gray-500">Install</div>
+                      <div className="text-sm font-bold text-gray-900 tabular-nums">{fmtShortDate(o.Install_Scheduled_Date__c)}</div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-ink-300 shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
                   </button>
                 </li>
               );
@@ -422,33 +389,55 @@ export function PullSheets() {
         )}
       </div>
 
-      {/* Print CSS — scoped here so this module's print behavior is self-contained. */}
-      <style>{`
-        @media print {
-          /* Hide everything outside the print area */
-          body * { visibility: hidden !important; }
-          .print-area, .print-area * { visibility: visible !important; }
-          .print-area { position: absolute; left: 0; top: 0; width: 100%; }
-          .no-print { display: none !important; }
-          .pull-sheet-page { page-break-after: always; box-shadow: none !important; border: none !important; padding: 0 !important; }
-          .pull-sheet-page:last-child { page-break-after: auto; }
-          @page { size: Letter; margin: 0.5in; }
-        }
-      `}</style>
+      <PrintCSS />
     </div>
   );
 }
 
-/* ───── small helpers ───── */
-function SummaryCard({ label, value, tone = 'default' }: { label: string; value: string; tone?: 'default' | 'sky' | 'sun' }) {
-  const accent = tone === 'sky' ? 'text-sky-dark' : tone === 'sun' ? 'text-sun-deep' : 'text-ink';
+/* ─── pieces ─── */
+
+function SummaryCard(props: { color: string; icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+  const Icon = props.icon;
   return (
-    <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-      <div className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">{label}</div>
-      <div className={`font-display text-[28px] leading-[32px] font-bold tabular mt-2 ${accent}`}>{value}</div>
+    <div className={`bg-gradient-to-br ${props.color} rounded-2xl shadow-2xl p-6 relative overflow-hidden`}>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+      <div className="relative z-10">
+        <Icon className="w-10 h-10 text-white/90 mb-3" />
+        <div className="text-4xl font-black text-white mb-2 tabular-nums">{props.value}</div>
+        <div className="text-sm text-white/80 font-medium">{props.label}</div>
+      </div>
     </div>
   );
 }
+
+function ChipButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className="px-3 py-2.5 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 text-xs font-semibold transition-colors"
+    >
+      {children}
+    </button>
+  );
+}
+
+function PrintCSS() {
+  return (
+    <style>{`
+      @media print {
+        body * { visibility: hidden !important; }
+        .print-area, .print-area * { visibility: visible !important; }
+        .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        .no-print { display: none !important; }
+        .pull-sheet-page { page-break-after: always; box-shadow: none !important; border: none !important; padding: 0 !important; }
+        .pull-sheet-page:last-child { page-break-after: auto; }
+        @page { size: Letter; margin: 0.5in; }
+      }
+    `}</style>
+  );
+}
+
+/* ─── utils ─── */
 
 function isoDate(d: Date): string {
   const t = new Date(d.getTime() - d.getTimezoneOffset() * 60_000);

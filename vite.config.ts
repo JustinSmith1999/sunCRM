@@ -19,23 +19,8 @@ export default defineConfig({
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: 'globalThis',
-      },
-    },
-  },
-  build: {
-    // Avoid the giant single-bundle problem; split heavy libs and the rest.
-    // Lower TTI for 100+ concurrent users hitting first paint.
-    chunkSizeWarningLimit: 1024,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'supabase': ['@supabase/supabase-js'],
-          'recharts': ['recharts'],
-          'icons': ['lucide-react'],
-        },
-      },
-    },
-  },
+        global: 'globalThis'
+      }
+    }
+  }
 });

@@ -1,95 +1,80 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm } from './components/Auth/LoginForm';
 import { MobileHeader } from './components/Layout/MobileHeader';
 import { Sidebar } from './components/Layout/Sidebar';
-
-// Critical-path screens (every user hits these) — eager.
 import { Home } from './components/Dashboard/Home';
 import { AccountList } from './components/Accounts/AccountList';
 import { DealsKanban } from './components/Deals/DealsKanban';
 import { LeadList } from './components/Leads/LeadList';
 import { TaskDashboard } from './components/Tasks/TaskDashboard';
 import { CaseList } from './components/Cases/CaseList';
-
-// Heavy / less-common screens — lazy. Lets first-paint render before pulling them.
-const ReportsDashboard       = lazy(() => import('./components/Reports/ReportsDashboard').then(m => ({ default: m.ReportsDashboard })));
-const ProductCatalog         = lazy(() => import('./components/Sales/ProductCatalog').then(m => ({ default: m.ProductCatalog })));
-const Campaigns              = lazy(() => import('./components/Sales/Campaigns').then(m => ({ default: m.Campaigns })));
-const KnowledgeBase          = lazy(() => import('./components/Service/KnowledgeBase').then(m => ({ default: m.KnowledgeBase })));
-const AdminDashboard         = lazy(() => import('./components/Admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
-const SalesforceUserMappings = lazy(() => import('./components/Admin/SalesforceUserMappings').then(m => ({ default: m.SalesforceUserMappings })));
-const SalesforceSync         = lazy(() => import('./components/Admin/SalesforceSync').then(m => ({ default: m.SalesforceSync })));
-const ContactsConsole        = lazy(() => import('./components/Admin/ContactsConsole').then(m => ({ default: m.ContactsConsole })));
-const DashboardsConsole      = lazy(() => import('./components/Admin/DashboardsConsole').then(m => ({ default: m.DashboardsConsole })));
-const WebFormsConsole        = lazy(() => import('./components/Admin/WebFormsConsole').then(m => ({ default: m.WebFormsConsole })));
-const AutomationConsole      = lazy(() => import('./components/Admin/AutomationConsole').then(m => ({ default: m.AutomationConsole })));
-const APIIntegrationsConsole = lazy(() => import('./components/Admin/APIIntegrationsConsole'));
-const UserManagement         = lazy(() => import('./components/Admin/UserManagement').then(m => ({ default: m.UserManagement })));
-const SystemSettings         = lazy(() => import('./components/Admin/SystemSettings').then(m => ({ default: m.SystemSettings })));
-const HRConsole              = lazy(() => import('./components/Admin/HRConsole').then(m => ({ default: m.HRConsole })));
-const PaylocityConsole       = lazy(() => import('./components/Admin/PaylocityConsole'));
-const FinanceDashboard       = lazy(() => import('./components/Admin/FinanceDashboard').then(m => ({ default: m.FinanceDashboard })));
-const AdminChangeLog         = lazy(() => import('./components/Admin/AdminChangeLog'));
-const CompanyEquipmentConsole= lazy(() => import('./components/Admin/CompanyEquipmentConsole').then(m => ({ default: m.CompanyEquipmentConsole })));
-const SoftwareSubscriptions  = lazy(() => import('./components/Admin/SoftwareSubscriptions').then(m => ({ default: m.SoftwareSubscriptions })));
-const EngineeringRequests    = lazy(() => import('./components/Admin/EngineeringRequests').then(m => ({ default: m.EngineeringRequests })));
-const SalesforceRequests     = lazy(() => import('./components/Admin/SalesforceRequests').then(m => ({ default: m.SalesforceRequests })));
-const DashboardsLibrary      = lazy(() => import('./components/Dashboard/DashboardsLibrary').then(m => ({ default: m.DashboardsLibrary })));
-const ChannelPartnersConsole = lazy(() => import('./components/Admin/ChannelPartnersConsole'));
-const PartnerPortal              = lazy(() => import('./components/Partners/PartnerPortal'));
-const PartnerWebForm             = lazy(() => import('./components/Public/PartnerWebForm'));
-const SolarLeadIntakeForm        = lazy(() => import('./components/Solar/SolarLeadIntakeForm').then(m => ({ default: m.SolarLeadIntakeForm })));
-const SolarPipelineView          = lazy(() => import('./components/Solar/SolarPipelineView').then(m => ({ default: m.SolarPipelineView })));
-const InstallationProjectTracker = lazy(() => import('./components/Solar/InstallationProjectTracker').then(m => ({ default: m.InstallationProjectTracker })));
-const SolarFinancingCalculator   = lazy(() => import('./components/Solar/SolarFinancingCalculator').then(m => ({ default: m.SolarFinancingCalculator })));
-const SolarDesignPlatform        = lazy(() => import('./components/Solar/SolarDesignPlatform').then(m => ({ default: m.SolarDesignPlatform })));
-const CustomerProfile            = lazy(() => import('./components/Customer/CustomerProfile').then(m => ({ default: m.CustomerProfile })));
-const OutlookCalendarSync        = lazy(() => import('./components/Calendar/OutlookCalendarSync'));
-const ServiceDashboard           = lazy(() => import('./components/Service/ServiceDashboard'));
-const DispatchBoard              = lazy(() => import('./components/Service/DispatchBoard'));
-const ServiceTicketsManager      = lazy(() => import('./components/Service/ServiceTicketsManager'));
-const ServiceCustomersManager    = lazy(() => import('./components/Service/ServiceCustomersManager'));
-const TechniciansManager         = lazy(() => import('./components/Service/TechniciansManager'));
-const PartsInventoryManager      = lazy(() => import('./components/Service/PartsInventoryManager'));
-const ServiceInvoicesManager     = lazy(() => import('./components/Service/ServiceInvoicesManager'));
-const SalesManagementDashboard   = lazy(() => import('./components/Sales/SalesManagementDashboard').then(m => ({ default: m.SalesManagementDashboard })));
-const SalesTeamDashboard         = lazy(() => import('./components/Dashboard/SalesTeamDashboard').then(m => ({ default: m.SalesTeamDashboard })));
-const ServiceTeamDashboard       = lazy(() => import('./components/Dashboard/ServiceTeamDashboard').then(m => ({ default: m.ServiceTeamDashboard })));
-const WarehouseSyncConsole       = lazy(() => import('./components/Admin/WarehouseSyncConsole'));
-const WarehouseInventory         = lazy(() => import('./components/Warehouse/WarehouseInventory'));
-const ProcessAutomationConsole   = lazy(() => import('./components/Admin/ProcessAutomationConsole'));
-const PermitManagementSystem     = lazy(() => import('./components/Service/PermitManagementSystem'));
-const ITSupportDashboard         = lazy(() => import('./components/ITSupport/ITSupportDashboard'));
-const MyTickets                  = lazy(() => import('./components/ITSupport/MyTickets'));
-const AteraConsole               = lazy(() => import('./components/Admin/AteraConsole'));
-const NotificationsPage          = lazy(() => import('./components/Notifications/NotificationsPage'));
-const ActivityFeed               = lazy(() => import('./components/Activity/ActivityFeed'));
-const SystemHealthDashboard      = lazy(() => import('./components/Admin/SystemHealthDashboard'));
-const FinanceLoans               = lazy(() => import('./components/Finance/FinanceLoans').then(m => ({ default: m.FinanceLoans })));
-const PaymentPlans               = lazy(() => import('./components/Finance/PaymentPlans').then(m => ({ default: m.PaymentPlans })));
-const Vouchers                   = lazy(() => import('./components/Finance/Vouchers').then(m => ({ default: m.Vouchers })));
-const IntercompanyPayments       = lazy(() => import('./components/Finance/IntercompanyPayments').then(m => ({ default: m.IntercompanyPayments })));
-const JournalRecords             = lazy(() => import('./components/Operations/JournalRecords').then(m => ({ default: m.JournalRecords })));
-const ResidentialContracts       = lazy(() => import('./components/Operations/ResidentialContracts').then(m => ({ default: m.ResidentialContracts })));
-const ProductionMonitoring      = lazy(() => import('./components/Operations/ProductionMonitoring').then(m => ({ default: m.ProductionMonitoring })));
-const CompanyEquipment           = lazy(() => import('./components/Operations/CompanyEquipment').then(m => ({ default: m.CompanyEquipment })));
-const LoyaltyProgram             = lazy(() => import('./components/Loyalty/LoyaltyProgram').then(m => ({ default: m.LoyaltyProgram })));
-const PullSheets                 = lazy(() => import('./components/Operations/PullSheets').then(m => ({ default: m.PullSheets })));
-const Quotes                     = lazy(() => import('./components/Sales/Quotes').then(m => ({ default: m.Quotes })));
-const ServicePaymentPlans        = lazy(() => import('./components/Service/ServicePaymentPlans').then(m => ({ default: m.ServicePaymentPlans })));
-
-import { MobileBottomNav } from './components/Layout/MobileBottomNav';
-import { InstallPrompt } from './components/Layout/InstallPrompt';
-import { RingCentralLoader } from './components/RingCentral/RingCentralLoader';
-
-// Suspense fallback for lazy routes
-const RouteFallback = () => (
-  <div className="flex items-center justify-center h-64">
-    <div className="w-8 h-8 border-[3px] border-sky border-t-transparent rounded-full animate-spin" />
-  </div>
-);
+import { ReportsDashboard } from './components/Reports/ReportsDashboard';
+import { ProductCatalog } from './components/Sales/ProductCatalog';
+import { Campaigns } from './components/Sales/Campaigns';
+import { KnowledgeBase } from './components/Service/KnowledgeBase';
+import { AdminDashboard } from './components/Admin/AdminDashboard';
+import { SalesforceUserMappings } from './components/Admin/SalesforceUserMappings';
+import { SalesforceSync } from './components/Admin/SalesforceSync';
+import { ContactsConsole } from './components/Admin/ContactsConsole';
+import { DashboardsConsole } from './components/Admin/DashboardsConsole';
+import { WebFormsConsole } from './components/Admin/WebFormsConsole';
+import { AutomationConsole } from './components/Admin/AutomationConsole';
+import APIIntegrationsConsole from './components/Admin/APIIntegrationsConsole';
+import { UserManagement } from './components/Admin/UserManagement';
+import { SystemSettings } from './components/Admin/SystemSettings';
+import { HRConsole } from './components/Admin/HRConsole';
+import PaylocityConsole from './components/Admin/PaylocityConsole';
+import { FinanceDashboard } from './components/Admin/FinanceDashboard';
+import AdminChangeLog from './components/Admin/AdminChangeLog';
+import { CompanyEquipmentConsole } from './components/Admin/CompanyEquipmentConsole';
+import { SoftwareSubscriptions } from './components/Admin/SoftwareSubscriptions';
+import { EngineeringRequests } from './components/Admin/EngineeringRequests';
+import { SalesforceRequests } from './components/Admin/SalesforceRequests';
+import { DashboardsLibrary } from './components/Dashboard/DashboardsLibrary';
+import ChannelPartnersConsole from './components/Admin/ChannelPartnersConsole';
+import PartnerPortal from './components/Partners/PartnerPortal';
+import PartnerWebForm from './components/Public/PartnerWebForm';
+import { SolarLeadIntakeForm } from './components/Solar/SolarLeadIntakeForm';
+import { SolarPipelineView } from './components/Solar/SolarPipelineView';
+import { InstallationProjectTracker } from './components/Solar/InstallationProjectTracker';
+import { SolarFinancingCalculator } from './components/Solar/SolarFinancingCalculator';
+import { SolarDesignPlatform } from './components/Solar/SolarDesignPlatform';
+import { CustomerProfile } from './components/Customer/CustomerProfile';
+import OutlookCalendarSync from './components/Calendar/OutlookCalendarSync';
+import ServiceDashboard from './components/Service/ServiceDashboard';
+import DispatchBoard from './components/Service/DispatchBoard';
+import ServiceTicketsManager from './components/Service/ServiceTicketsManager';
+import ServiceCustomersManager from './components/Service/ServiceCustomersManager';
+import TechniciansManager from './components/Service/TechniciansManager';
+import PartsInventoryManager from './components/Service/PartsInventoryManager';
+import ServiceInvoicesManager from './components/Service/ServiceInvoicesManager';
+import { SalesManagementDashboard } from './components/Sales/SalesManagementDashboard';
+import { SalesTeamDashboard } from './components/Dashboard/SalesTeamDashboard';
+import { ServiceTeamDashboard } from './components/Dashboard/ServiceTeamDashboard';
+import WarehouseSyncConsole from './components/Admin/WarehouseSyncConsole';
+import WarehouseInventory from './components/Warehouse/WarehouseInventory';
+import ProcessAutomationConsole from './components/Admin/ProcessAutomationConsole';
+import PermitManagementSystem from './components/Service/PermitManagementSystem';
+import ITSupportDashboard from './components/ITSupport/ITSupportDashboard';
+import MyTickets from './components/ITSupport/MyTickets';
+import AteraConsole from './components/Admin/AteraConsole';
+import NotificationsPage from './components/Notifications/NotificationsPage';
+import ActivityFeed from './components/Activity/ActivityFeed';
+import SystemHealthDashboard from './components/Admin/SystemHealthDashboard';
+import { FinanceLoans } from './components/Finance/FinanceLoans';
+import { PaymentPlans } from './components/Finance/PaymentPlans';
+import { Vouchers } from './components/Finance/Vouchers';
+import { IntercompanyPayments } from './components/Finance/IntercompanyPayments';
+import { JournalRecords } from './components/Operations/JournalRecords';
+import { ResidentialContracts } from './components/Operations/ResidentialContracts';
+import { ProductionMonitoring } from './components/Operations/ProductionMonitoring';
+import { CompanyEquipment } from './components/Operations/CompanyEquipment';
+import { LoyaltyProgram } from './components/Loyalty/LoyaltyProgram';
+import { Quotes } from './components/Sales/Quotes';
+import { ServicePaymentPlans } from './components/Service/ServicePaymentPlans';
+import { PullSheets } from './components/Operations/PullSheets';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState('home');
@@ -293,29 +278,12 @@ function AppContent() {
       />
 
         {/* Main Content */}
-        <main
-          className={`flex-1 overflow-auto pt-12 md:pt-0 min-h-screen transition-all duration-300 ${
-            sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
-          } px-4 md:px-6 py-4`}
-          style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
-        >
-          <Suspense fallback={<RouteFallback />}>
-            {renderView()}
-          </Suspense>
+        <main className={`flex-1 overflow-auto pt-12 md:pt-0 min-h-screen transition-all duration-300 ${
+          sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
+        } px-4 md:px-6 py-4`}>
+        {renderView()}
         </main>
       </div>
-
-      {/* Mobile-only bottom tab bar + install-to-homescreen prompt */}
-      <MobileBottomNav
-        currentView={currentView}
-        onNavigate={setCurrentView}
-        onOpenMore={() => setShowMobileSidebar(true)}
-      />
-      <InstallPrompt />
-
-      {/* Lazy-load the RingCentral embeddable adapter only after auth.
-          Prevents the call-popup from rendering on the login screen. */}
-      <RingCentralLoader />
     </div>
   );
 }

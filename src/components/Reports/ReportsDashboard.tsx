@@ -244,90 +244,95 @@ export function ReportsDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-sky border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
       <div className="max-w-[1800px] mx-auto space-y-6">
 
-        <div className="flex items-end justify-between flex-wrap gap-3">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <div className="text-[11px] font-bold tracking-eyebrow uppercase text-sky-dark">Analytics</div>
-            <h1 className="font-display text-[34px] leading-[40px] font-bold text-ink mt-1 tracking-tighter">Reports &amp; Insights</h1>
-            <p className="text-sm text-ink-muted mt-1">Real-time business intelligence across pipeline, revenue, and operations.</p>
+            <h1 className="text-3xl font-black text-white">Analytics Command Center</h1>
+            <p className="text-slate-400 mt-1">Real-time business intelligence and reporting</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <select
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="h-10 px-3 bg-white border border-line rounded-full text-sm text-ink focus:outline-none focus:ring-2 focus:ring-sky"
+              className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
             >
-              <option value="30">Last 30 days</option>
-              <option value="60">Last 60 days</option>
-              <option value="90">Last 90 days</option>
-              <option value="180">Last 6 months</option>
-              <option value="365">Last year</option>
+              <option value="30">Last 30 Days</option>
+              <option value="60">Last 60 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="180">Last 6 Months</option>
+              <option value="365">Last Year</option>
             </select>
             <button
               onClick={handleSyncReports}
               disabled={syncing}
-              className="h-10 px-4 bg-sky hover:bg-sky-deep text-white rounded-full transition-all duration-fast ease-smooth flex items-center gap-2 text-sm font-semibold press-scale shadow-soft disabled:opacity-50"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
             >
               <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-              Sync
+              Sync Reports
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Total Revenue</span>
-              <DollarSign className="w-4 h-4 text-court" />
-            </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{formatCurrency(analytics.totalRevenue)}</div>
-            <div className="text-xs text-ink-muted mt-1 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3 text-court" /> Last {dateRange} days
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Active Deals</span>
-              <Target className="w-4 h-4 text-sky" />
-            </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{analytics.activeDeals.toLocaleString()}</div>
-            <div className="text-xs text-ink-muted mt-1">Open pipeline</div>
-          </div>
-
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Win Rate</span>
-              <Award className="w-4 h-4 text-sun-deep" />
-            </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{analytics.winRate.toFixed(0)}%</div>
-            <div className="text-xs text-ink-muted mt-1">
-              {analytics.closedWon} won &middot; {analytics.closedLost} lost
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <DollarSign className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-4xl font-black text-white mb-2">{formatCurrency(analytics.totalRevenue)}</div>
+              <div className="text-sm text-emerald-100 font-medium">Total Revenue</div>
+              <div className="mt-2 flex items-center gap-1 text-xs text-emerald-200">
+                <TrendingUp className="w-3 h-3" />
+                <span>Last {dateRange} days</span>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-line p-4 shadow-soft">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-eyebrow uppercase text-ink-subtle">Avg Deal Size</span>
-              <Activity className="w-4 h-4 text-ink-300" />
+          <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <Target className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-5xl font-black text-white mb-2">{analytics.activeDeals}</div>
+              <div className="text-sm text-blue-100 font-medium">Active Deals</div>
+              <div className="mt-2 text-xs text-blue-200 bg-blue-500/20 px-2 py-1 rounded-full inline-block">
+                Open Pipeline
+              </div>
             </div>
-            <div className="font-display text-[28px] leading-[32px] font-bold text-ink tabular mt-2">{formatCurrency(analytics.avgDealSize)}</div>
-            <div className="text-xs text-ink-muted mt-1">Across pipeline</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <Award className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-5xl font-black text-white mb-2">{analytics.winRate.toFixed(0)}%</div>
+              <div className="text-sm text-amber-100 font-medium">Win Rate</div>
+              <div className="mt-2 text-xs text-amber-200">
+                {analytics.closedWon} won / {analytics.closedLost} lost
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <Activity className="w-10 h-10 text-white/90 mb-3" />
+              <div className="text-4xl font-black text-white mb-2">{formatCurrency(analytics.avgDealSize)}</div>
+              <div className="text-sm text-purple-100 font-medium">Avg Deal Size</div>
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-soft p-6 border border-line">
-            <h3 className="text-base font-semibold text-ink mb-4 flex items-center gap-2">
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-slate-700/50">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-emerald-400" />
               Revenue Over Time
             </h3>
@@ -353,8 +358,8 @@ export function ReportsDashboard() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-white rounded-lg shadow-soft p-6 border border-line">
-            <h3 className="text-base font-semibold text-ink mb-4 flex items-center gap-2">
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-slate-700/50">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-blue-400" />
               Pipeline by Stage
             </h3>
@@ -379,8 +384,8 @@ export function ReportsDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-soft p-6 border border-line">
-            <h3 className="text-base font-semibold text-ink mb-4 flex items-center gap-2">
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-slate-700/50">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Zap className="w-5 h-5 text-amber-400" />
               Win/Loss Analysis
             </h3>
@@ -410,29 +415,29 @@ export function ReportsDashboard() {
             <div className="flex items-center justify-center gap-6 mt-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                <span className="text-sm text-ink-muted">Won: {analytics.closedWon}</span>
+                <span className="text-sm text-slate-300">Won: {analytics.closedWon}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-                <span className="text-sm text-ink-muted">Lost: {analytics.closedLost}</span>
+                <span className="text-sm text-slate-300">Lost: {analytics.closedLost}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-soft p-6 border border-line">
-            <h3 className="text-base font-semibold text-ink mb-4 flex items-center gap-2">
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-slate-700/50">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <FileText className="w-5 h-5 text-cyan-400" />
               Reports Library
             </h3>
             <div className="space-y-3 max-h-[300px] overflow-y-auto">
               <div className="relative mb-3">
-                <Search className="w-4 h-4 text-ink-300 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search reports..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-sky text-ink text-sm placeholder-ink-300"
+                  className="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 text-white text-sm placeholder-slate-500"
                 />
               </div>
               {filteredReports.slice(0, 8).map((report) => (
@@ -444,19 +449,19 @@ export function ReportsDashboard() {
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <FileText className="w-4 h-4 text-cyan-400 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-ink text-sm truncate group-hover:text-sky transition-colors">
+                      <div className="font-medium text-white text-sm truncate group-hover:text-cyan-400 transition-colors">
                         {report.name}
                       </div>
                       {report.folder && (
-                        <div className="text-xs text-ink-subtle truncate">{report.folder}</div>
+                        <div className="text-xs text-slate-400 truncate">{report.folder}</div>
                       )}
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-ink-300 flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
                 </div>
               ))}
               {filteredReports.length > 8 && (
-                <div className="text-center text-sm text-ink-subtle pt-2">
+                <div className="text-center text-sm text-slate-400 pt-2">
                   +{filteredReports.length - 8} more reports
                 </div>
               )}
@@ -467,14 +472,14 @@ export function ReportsDashboard() {
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => setShowBuilder(true)}
-            className="px-6 py-3 bg-sky hover:bg-sky-deep text-white rounded-full font-semibold transition-all duration-fast ease-smooth flex items-center gap-2 shadow-soft press-scale"
+            className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50"
           >
             <Plus className="w-5 h-5" />
             Create Custom Report
           </button>
           <button
             onClick={() => setSelectedFolder(null)}
-            className="px-6 py-3 bg-white hover:bg-ink-50 text-ink border border-line-strong rounded-full font-semibold transition-colors duration-fast ease-smooth flex items-center gap-2 press-scale"
+            className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-colors flex items-center gap-2"
           >
             <Grid3x3 className="w-5 h-5" />
             View All Reports ({reports.length})
