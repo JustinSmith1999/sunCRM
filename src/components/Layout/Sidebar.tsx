@@ -340,6 +340,14 @@ const menuItems: MenuItem[] = [
         allowedRoles: ['admin', 'operations_manager', 'operations', 'warehouse_manager']
       },
       {
+        id: 'pull-sheets',
+        label: 'Pull Sheets',
+        icon: ClipboardList,
+        // Wide open for the demo — anyone authenticated can see it. Tighten later
+        // once role boundaries for the warehouse staff are finalized.
+        allowedRoles: ['admin', 'operations_manager', 'operations', 'warehouse_manager', 'sales_manager', 'sales_rep', 'support']
+      },
+      {
         id: 'warehouse-sync',
         label: 'Sync Console',
         icon: RefreshCw,

@@ -76,6 +76,7 @@ const ResidentialContracts       = lazy(() => import('./components/Operations/Re
 const ProductionMonitoring      = lazy(() => import('./components/Operations/ProductionMonitoring').then(m => ({ default: m.ProductionMonitoring })));
 const CompanyEquipment           = lazy(() => import('./components/Operations/CompanyEquipment').then(m => ({ default: m.CompanyEquipment })));
 const LoyaltyProgram             = lazy(() => import('./components/Loyalty/LoyaltyProgram').then(m => ({ default: m.LoyaltyProgram })));
+const PullSheets                 = lazy(() => import('./components/Operations/PullSheets').then(m => ({ default: m.PullSheets })));
 const Quotes                     = lazy(() => import('./components/Sales/Quotes').then(m => ({ default: m.Quotes })));
 const ServicePaymentPlans        = lazy(() => import('./components/Service/ServicePaymentPlans').then(m => ({ default: m.ServicePaymentPlans })));
 
@@ -262,6 +263,8 @@ function AppContent() {
         return <LoyaltyProgram />;
       case 'service-payment-plans':
         return <ServicePaymentPlans />;
+      case 'pull-sheets':
+        return <PullSheets />;
       default:
         return <Home onViewChange={setCurrentView} />;
     }

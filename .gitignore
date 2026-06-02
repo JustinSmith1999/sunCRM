@@ -36,6 +36,11 @@ real-sunation-employees.csv
 hr-records-import.csv
 leads-import.csv
 
+# CRITICAL — temp-password CSV. NEVER commit. Delete after distributing.
+employees-credentials.csv
+*credentials*.csv
+*passwords*.csv
+
 # Throwaway DB probes
 sb-probe.mjs
 sb-test.mjs
