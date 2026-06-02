@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Calendar, Printer, Search, FileText, ChevronLeft, RefreshCw, ChevronRight } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Calendar, Printer, Search, FileText, ChevronLeft, RefreshCw, ChevronRight, Hash, ArrowRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { SELECT_CLAUSE, BOM_CATEGORIES, hasValue } from './bomFields';
 import { PullSheetPrintable } from './PullSheetPrintable';
@@ -42,7 +42,53 @@ export function PullSheets() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openId, setOpenId] = useState<string | null>(null);
+  const [openOpp, setOpenOpp] = useState<Opp | null>(null);          // for lookups outside the date window
+  const [openAcc, setOpenAcc] = useState<Account | null>(null);
   const [mode, setMode] = useState<'list' | 'detail' | 'printAll'>('list');
+
+  // Job # lookup — the warehouse's primary workflow. Auto-focused on load,
+  // takes a server-side direct hit on opportunities and jumps straight to
+  // the printable sheet. Bypasses the date window so any job is reachable.
+  const [lookupValue, setLookupValue] = useState('');
+  const [lookupBusy, setLookupBusy] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const lookupRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (mode === 'list') lookupRef.current?.focus(); }, [mode]);
+
+  const lookupJob = async (raw: string) => {
+    const job = raw.trim();
+    if (!job) return;
+    setLookupBusy(true);
+    setLookupError(null);
+    const { data, error } = await supabase
+      .from('opportunities')
+      .select(SELECT_CLAUSE)
+      .eq('Job_Number__c', job)
+      .order('LastModifiedDate', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    setLookupBusy(false);
+    if (error) {
+      setLookupError(error.message);
+      return;
+    }
+    if (!data) {
+      setLookupError(`No job found matching #${job}.`);
+      return;
+    }
+    const opp = data as unknown as Opp;
+    // Fetch the account in one round-trip too, so the sheet renders complete.
+    let acc: Account | null = null;
+    if (opp.AccountId) {
+      const { data: a } = await supabase.from('accounts').select('Id, Name, Phone').eq('Id', opp.AccountId).maybeSingle();
+      acc = (a as Account) ?? null;
+    }
+    setOpenOpp(opp);
+    setOpenAcc(acc);
+    setOpenId(opp.Id);
+    setMode('detail');
+    setLookupValue('');
+  };
 
   const load = async () => {
     setLoading(true);
@@ -126,13 +172,18 @@ export function PullSheets() {
   /* ────────── Render ────────── */
 
   if (mode === 'detail' && openId) {
-    const opp = opps.find((o) => o.Id === openId);
+    // Prefer the explicitly looked-up record (works for jobs outside the
+    // current date window). Fall back to the in-window list otherwise.
+    const opp = openOpp ?? opps.find((o) => o.Id === openId) ?? null;
     if (!opp) return null;
-    const acc = opp.AccountId ? accounts.get(opp.AccountId) ?? null : null;
+    const acc = openAcc ?? (opp.AccountId ? accounts.get(opp.AccountId) ?? null : null);
     return (
       <div className="max-w-4xl mx-auto animate-fade-up">
         <div className="flex items-center justify-between mb-4 no-print">
-          <button onClick={() => setMode('list')} className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-sky transition-colors">
+          <button
+            onClick={() => { setMode('list'); setOpenOpp(null); setOpenAcc(null); setOpenId(null); }}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-sky transition-colors"
+          >
             <ChevronLeft className="w-4 h-4" /> Back to list
           </button>
           <button
@@ -209,6 +260,45 @@ export function PullSheets() {
           </button>
         </div>
       </div>
+
+      {/* Job # quick lookup — matches the Excel muscle memory: type job#, get sheet. */}
+      <form
+        onSubmit={(e) => { e.preventDefault(); lookupJob(lookupValue); }}
+        className="bg-navy text-white rounded-lg p-5 shadow-card flex flex-wrap items-end gap-3"
+      >
+        <div className="flex-1 min-w-[280px]">
+          <label className="block text-[11px] font-bold tracking-eyebrow uppercase text-sky-pale/80 mb-1.5">
+            Type a Job # → Get the Pull Sheet
+          </label>
+          <div className="relative">
+            <Hash className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-sky-soft pointer-events-none" />
+            <input
+              ref={lookupRef}
+              type="text"
+              inputMode="numeric"
+              autoFocus
+              autoComplete="off"
+              value={lookupValue}
+              onChange={(e) => { setLookupValue(e.target.value); setLookupError(null); }}
+              placeholder="e.g. 25734"
+              className="w-full h-12 pl-11 pr-3 bg-white text-ink rounded-lg text-base font-semibold placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sun tabular"
+            />
+          </div>
+          {lookupError && <div className="text-[12px] text-sun-soft mt-1.5 font-medium">{lookupError}</div>}
+        </div>
+        <button
+          type="submit"
+          disabled={lookupBusy || !lookupValue.trim()}
+          className="h-12 px-6 rounded-full bg-sun hover:bg-sun-deep text-ink font-semibold text-sm shadow-soft press-scale transition-all duration-fast ease-smooth disabled:opacity-50 inline-flex items-center gap-2"
+        >
+          {lookupBusy ? (
+            <span className="inline-block w-4 h-4 border-2 border-ink border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <ArrowRight className="w-4 h-4" />
+          )}
+          Open Sheet
+        </button>
+      </form>
 
       {/* Filter bar */}
       <div className="bg-white border border-line rounded-lg p-4 shadow-soft">
